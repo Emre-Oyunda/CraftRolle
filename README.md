@@ -56,6 +56,9 @@ Gerçekçi 3D sayfa çevirme efekti ile hikayelerinizi yazın ve okuyun! 🌸�
 
 ## 📖 3D Kitap Görüntüleyici Kullanımı
 
+### Erişim
+3D kitap görüntüleyiciye ulaşmak için: `public/3d/view_book.php?id=KITAP_ID`
+
 ### Klavye Kontrolleri
 - **←** (Sol Ok): Önceki sayfa
 - **→** (Sağ Ok): Sonraki sayfa
@@ -81,20 +84,32 @@ Gerçekçi 3D sayfa çevirme efekti ile hikayelerinizi yazın ve okuyun! 🌸�
 
 ```
 craftrolle/
-├── public/              # Genel erişilebilir dosyalar
-│   ├── index.php       # Ana sayfa
-│   ├── view_book.php   # 3D Kitap görüntüleyici
-│   └── ...
-├── src/                # Backend kod
-│   ├── config.php     # Veritabanı ve genel ayarlar
-│   ├── helpers.php    # Yardımcı fonksiyonlar
-│   ├── auth.php       # Kimlik doğrulama
-│   └── csrf.php       # CSRF koruması
-├── assets/            # Statik dosyalar
+├── public/                    # Genel erişilebilir dosyalar
+│   ├── 3d/                   # 3D Kitap Görüntüleyici
+│   │   └── view_book.php    # 3D görüntüleyici sayfası
+│   ├── index.php            # Ana sayfa
+│   ├── login.php            # Giriş sayfası
+│   ├── register.php         # Kayıt sayfası
+│   ├── dashboard.php        # Kullanıcı paneli
+│   ├── books.php            # Kitap listesi
+│   ├── notes.php            # Not listesi
+│   ├── eglence.php          # Eğlence araçları
+│   ├── designer_cover.php   # Kapak tasarım aracı
+│   ├── designer_map.php     # Harita tasarım aracı
+│   ├── export_print.php     # Yazdırma/PDF
+│   ├── logout.php           # Çıkış
+│   └── .htaccess           # Apache yapılandırması
+├── src/                     # Backend kod
+│   ├── config.php          # Veritabanı ve genel ayarlar
+│   ├── helpers.php         # Yardımcı fonksiyonlar
+│   ├── auth.php            # Kimlik doğrulama
+│   └── csrf.php            # CSRF koruması
+├── assets/                 # Statik dosyalar
 │   └── css/
-│       └── style.css  # 3D görüntüleyici dahil tüm stiller
-├── uploads/           # Kullanıcı yüklemeleri
-└── database.sql       # Veritabanı şeması
+│       └── style.css       # Tüm CSS (3D görüntüleyici dahil)
+├── uploads/                # Kullanıcı yüklemeleri (kapaklar vb.)
+├── database.sql            # Veritabanı şeması
+└── README.md              # Bu dosya
 ```
 
 ## 🔐 Varsayılan Giriş Bilgileri

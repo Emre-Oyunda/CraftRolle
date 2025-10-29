@@ -1,0 +1,32 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Database
+*.sql.gz
+*.sql.zip
+
+# Environment files
+.env
+
+# Uploads directory (keep structure, ignore files)
+uploads/*
+!uploads/.gitkeep
+
+# Composer
+vendor/
+composer.lock
+
+# NPM
+node_modules/
+package-lock.json

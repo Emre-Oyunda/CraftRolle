@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/../src/config.php';
-require_once __DIR__ . '/../src/helpers.php';
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/csrf.php';
+require_once __DIR__ . '/../../src/config.php';
+require_once __DIR__ . '/../../src/helpers.php';
+require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../src/csrf.php';
 $user = current_user();
 ?>
 <!doctype html>
@@ -11,7 +11,7 @@ $user = current_user();
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e(APP_NAME) ?> - 3D Kitap Görüntüleyici</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 <body>
   <div class="container">
@@ -82,7 +82,7 @@ if (count($pages) % 2 !== 0) {
       </div>
       
       <?php if ($book['cover_path']): ?>
-        <img src="<?= base_url('../' . ltrim($book['cover_path'], '/')) ?>" 
+        <img src="<?= base_url('../../' . ltrim($book['cover_path'], '/')) ?>" 
              style="max-width:200px; border-radius:12px; border:1px solid var(--border); margin:15px 0; display:block;">
       <?php endif; ?>
 
