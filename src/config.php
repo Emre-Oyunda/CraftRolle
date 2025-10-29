@@ -3,8 +3,8 @@ define('APP_NAME', 'CraftRolle');
 define('BASE_URL', 'http://localhost/public/');
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'craftrolle');
-define('DB_USER', 'root');  // MySQL sunucu kullanıcısı (XAMPP/WAMP için root)
-define('DB_PASS', '');      // MySQL sunucu şifresi (XAMPP için genelde boş)
+define('DB_USER', 'root');  // MySQL sunucu kullanıcısı
+define('DB_PASS', '');      // MySQL root şifreniz (XAMPP: boş, MAMP: 'root', diğer: kendi şifreniz)
 
 function db() {
     static $pdo = null;
