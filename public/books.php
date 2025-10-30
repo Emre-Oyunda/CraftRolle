@@ -56,7 +56,7 @@ $books = $st->fetchAll(PDO::FETCH_ASSOC);
                      style="max-width:150px; border-radius:8px; margin:10px 0;">
               <?php endif; ?>
               <div style="margin-top: 10px;">
-                <a href="<?= base_url('3d/view_book.php?id=' . $book['id']) ?>" class="btn">
+                <a href="<?= base_url('view_book.php?id=' . $book['id']) ?>" class="btn">
                   📖 3D Görüntüle
                 </a>
                 <a href="<?= base_url('book_edit.php?id=' . $book['id']) ?>" class="btn">
