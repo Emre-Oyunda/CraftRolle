@@ -43,108 +43,9 @@ $totalPages = count($pages);
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?= e(APP_NAME) ?> - 3D Kitap Görüntüleyici</title>
+<title><?= e(APP_NAME) ?></title>
+<link rel="stylesheet" href="../assets/css/style.css">
 <style>
-:root {
-  --primary: #ff6b9d;
-  --secondary: #c44569;
-  --bg: #fef5f1;
-  --card-bg: #fff;
-  --text: #2d3436;
-  --border: #dfe6e9;
-  --shadow: rgba(0,0,0,0.1);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #fef5f1 0%, #ffe8e0 100%);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 20px;
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px var(--shadow);
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.brand {
-  font-size: 1.5em;
-  font-weight: bold;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s;
-  font-size: 14px;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.4);
-}
-
-.badge {
-  background: linear-gradient(135deg, #ff6b9d20, #c4456920);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.small {
-  font-size: 0.9em;
-  color: #636e72;
-  margin: 10px 0;
-}
-
-a {
-  color: var(--primary);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-a:hover {
-  color: var(--secondary);
-}
-
-h2 {
-  color: var(--text);
-  margin-bottom: 15px;
-}
 
 /* ========== 3D BOOK VIEWER STYLES ========== */
 
@@ -335,28 +236,6 @@ h2 {
   font-size: 14px;
   color: var(--text);
   font-weight: 500;
-}
-
-.bottom-nav {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-}
-
-.bottom-nav a {
-  padding: 10px 20px;
-  background: white;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px var(--shadow);
-}
-
-.bottom-nav a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--shadow);
 }
 
 @media (max-width: 900px) {
