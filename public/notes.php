@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $st = db()->prepare('INSERT INTO notes(user_id, title, content, updated_at) VALUES(?,?,?,?)');
-    $st->execute([$uid, $title, $content, date('Y-m-d H:i:s')]);
+    $st->execute([$uid, $title, $content, date('c')]);
 
     $id = (int) db()->lastInsertId();
     $st = db()->prepare('SELECT * FROM notes WHERE id = ? AND user_id = ?');
@@ -711,7 +711,7 @@ if ($uid) {
     <div class="menu">
       <nav class="nav-links" aria-label="Ana menü">
         <a class="nav-link nav-link-primary is-active" href="<?= base_url('notes.php') ?>">✨ Not Yaz</a>
-        <a class="nav-link" href="#notes-archive">📒 Notlarım</a>
+        <a class="nav-link" href="<?= base_url('notes.php') ?>#notes-archive">📒 Notlarım</a>
         <span class="nav-divider" aria-hidden="true"></span>
         <a class="nav-link" href="<?= base_url('dashboard.php') ?>">📊 Panel</a>
         <a class="nav-link" href="<?= base_url('books.php') ?>">📚 Kitaplarım</a>
