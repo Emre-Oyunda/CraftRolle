@@ -413,10 +413,44 @@ $user = current_user();
 </head><body>
 
 <!-- Theme Toggle Button -->
-<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+<button class="theme-toggle" id="theme-toggle">
   <span class="theme-toggle-icon" id="theme-icon">🌸</span>
   <span id="theme-text">Pembe</span>
 </button>
+
+<script>
+// === THEME SWITCHER - Global scope ===
+function toggleTheme() {
+  const body = document.body;
+  const icon = document.getElementById('theme-icon');
+  const text = document.getElementById('theme-text');
+  
+  body.classList.toggle('dark-theme');
+  
+  if (body.classList.contains('dark-theme')) {
+    icon.textContent = '🌙';
+    text.textContent = 'Siyah';
+    localStorage.setItem('eglence-theme', 'dark');
+  } else {
+    icon.textContent = '🌸';
+    text.textContent = 'Pembe';
+    localStorage.setItem('eglence-theme', 'light');
+  }
+}
+
+// Load saved theme on page load
+(function() {
+  const savedTheme = localStorage.getItem('eglence-theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    document.getElementById('theme-icon').textContent = '🌙';
+    document.getElementById('theme-text').textContent = 'Siyah';
+  }
+})();
+
+// Attach click event
+document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+</script>
 
 <div class="container">
   <div class="card header">
@@ -914,34 +948,6 @@ $user = current_user();
 
 })();
 
-// === THEME SWITCHER ===
-function toggleTheme() {
-  const body = document.body;
-  const icon = document.getElementById('theme-icon');
-  const text = document.getElementById('theme-text');
-  
-  body.classList.toggle('dark-theme');
-  
-  if (body.classList.contains('dark-theme')) {
-    icon.textContent = '🌙';
-    text.textContent = 'Siyah';
-    localStorage.setItem('eglence-theme', 'dark');
-  } else {
-    icon.textContent = '🌸';
-    text.textContent = 'Pembe';
-    localStorage.setItem('eglence-theme', 'light');
-  }
-}
-
-// Load saved theme on page load
-(function() {
-  const savedTheme = localStorage.getItem('eglence-theme');
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-    document.getElementById('theme-icon').textContent = '🌙';
-    document.getElementById('theme-text').textContent = 'Siyah';
-  }
-})();
 
 </script>
 </body></html>
