@@ -11,10 +11,10 @@ $user = current_user();
 <title><?= e(APP_NAME) ?> — Eğlence</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
-  /* Eğlence sayfası özel stilleri - Soft Pastel Pink-Purple */
+  /* Eğlence sayfası özel stilleri - Dark Pink-Purple Theme */
   body{
-    background: linear-gradient(135deg, #fef5ff 0%, #fff0f9 25%, #f8f0ff 50%, #fff5fb 75%, #fef5ff 100%);
-    color:#5a3d5c;
+    background: linear-gradient(135deg, #1a0e1f 0%, #2a1535 50%, #1a0e1f 100%);
+    color:#f5d7f5;
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
     margin:0;
     min-height:100vh;
@@ -30,9 +30,9 @@ $user = current_user();
     width: 100%;
     height: 100%;
     background-image: 
-      radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(221, 160, 221, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.1) 0%, transparent 50%);
+      radial-gradient(circle at 20% 50%, rgba(255, 105, 180, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(186, 85, 211, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 40% 20%, rgba(221, 160, 221, 0.06) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
   }
@@ -51,24 +51,24 @@ $user = current_user();
   }
   
   .card{
-    border:1px solid rgba(255, 182, 193, 0.4);
+    border:1px solid rgba(186, 85, 211, 0.3);
     border-radius:20px;
     padding:24px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 250, 253, 0.8) 100%);
+    background: linear-gradient(135deg, rgba(42, 21, 53, 0.8) 0%, rgba(58, 29, 68, 0.7) 100%);
     backdrop-filter: blur(10px);
     margin-bottom:20px;
     box-shadow: 
-      0 4px 20px rgba(221, 160, 221, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 105, 180, 0.15);
     transition: all 0.3s ease;
   }
   
   .card:hover {
     transform: translateY(-2px);
     box-shadow: 
-      0 8px 30px rgba(255, 182, 193, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 1);
-    border-color: rgba(255, 182, 193, 0.6);
+      0 12px 40px rgba(186, 85, 211, 0.3),
+      inset 0 1px 0 rgba(255, 105, 180, 0.25);
+    border-color: rgba(186, 85, 211, 0.5);
   }
   
   .wrap .card h2 {
@@ -82,7 +82,7 @@ $user = current_user();
   }
   
   .wrap .card h3 {
-    color: #8b5a8e;
+    color: #f5b6e8;
     font-size: 1.3em;
     margin: 0 0 16px 0;
     font-weight: 600;
@@ -99,16 +99,16 @@ $user = current_user();
   
   .btn{
     padding:12px 20px;
-    border:1px solid rgba(255, 182, 193, 0.5);
+    border:1px solid rgba(186, 85, 211, 0.5);
     border-radius:12px;
-    background: linear-gradient(135deg, #dda0dd 0%, #d8a0d8 100%);
+    background: linear-gradient(135deg, #ba55d3 0%, #9370db 100%);
     color:#fff !important;
     cursor:pointer;
     text-decoration:none;
     display:inline-block;
     font-weight:500;
     transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(221, 160, 221, 0.3);
+    box-shadow: 0 4px 12px rgba(186, 85, 211, 0.4);
     position: relative;
     overflow: hidden;
   }
@@ -121,7 +121,7 @@ $user = current_user();
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.2);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
@@ -133,8 +133,8 @@ $user = current_user();
   
   .btn:hover{
     transform: translateY(-2px);
-    box-shadow: 0 5px 18px rgba(221, 160, 221, 0.4);
-    border-color: rgba(255, 182, 193, 0.7);
+    box-shadow: 0 6px 20px rgba(186, 85, 211, 0.6);
+    border-color: rgba(255, 105, 180, 0.7);
   }
   
   .btn:active {
@@ -142,16 +142,16 @@ $user = current_user();
   }
   
   .btn.active{
-    background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 100%) !important;
-    box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.4);
-    border-color: rgba(255, 182, 193, 0.8);
+    background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%) !important;
+    box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.5);
+    border-color: rgba(255, 105, 180, 0.8);
   }
   
   .small{
-    opacity:.8;
+    opacity:.85;
     font-size:0.9em;
     line-height:1.6;
-    color:#7a5c7d;
+    color:#d8b5d8;
   }
   
   .out{
@@ -159,11 +159,11 @@ $user = current_user();
     margin:16px 0;
     font-weight:600;
     padding:12px;
-    background: rgba(255, 182, 193, 0.12);
+    background: rgba(186, 85, 211, 0.15);
     border-radius:12px;
-    border:1px solid rgba(221, 160, 221, 0.25);
+    border:1px solid rgba(186, 85, 211, 0.3);
     line-height:1.6;
-    color:#5a3d5c;
+    color:#f5d7f5;
   }
   
   .row{
