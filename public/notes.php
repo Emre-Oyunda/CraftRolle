@@ -12,7 +12,7 @@ $notes = [];
 $notesCount = 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    csrf_check();
+    verify_csrf();
 
     $title = trim($_POST['title'] ?? '');
     if ($title === '') {
@@ -752,7 +752,7 @@ if ($uid) {
       <p class="small">Zengin metin düzenleyici ve otomatik taslak ile fikirlerin güvende.</p>
 
       <form method="post" id="note-form" action="<?= e(base_url('notes.php')) ?>" data-draft-key="notes_draft_user_<?= (int) $uid ?>">
-        <?php csrf_field(); ?>
+        <?= csrf_field() ?>
 
         <div class="toolbar" aria-label="Metin düzenleme araçları">
           <button type="button" class="btn btn-ghost" data-cmd="bold" title="Kalın (Ctrl+B)"><strong>B</strong></button>
