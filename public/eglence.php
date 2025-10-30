@@ -21,7 +21,7 @@ $user = current_user();
     margin:0;
     min-height:100vh;
     position:relative;
-    transition: background 0.5s ease, color 0.3s ease;
+    transition: all 0.5s ease;
   }
   
   body::before {
@@ -37,20 +37,22 @@ $user = current_user();
       radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.1) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
-    transition: opacity 0.5s ease;
+    transition: all 0.5s ease;
+    opacity: 1;
   }
   
-  /* DARK THEME */
+  /* DARK THEME - Mor-Siyah Arka Plan */
   body.dark-theme {
-    background: linear-gradient(135deg, #0e0b1a 0%, #1a0e2e 50%, #0e0b1a 100%);
+    background: linear-gradient(135deg, #0e0b1a 0%, #1a0e2e 25%, #2a1535 50%, #1a0e2e 75%, #0e0b1a 100%);
     color:#f5e8ff;
   }
   
   body.dark-theme::before {
     background-image: 
-      radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 107, 157, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+      radial-gradient(circle at 20% 50%, rgba(255, 105, 180, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(186, 85, 211, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 40% 20%, rgba(221, 160, 221, 0.08) 0%, transparent 50%);
+    opacity: 1;
   }
   
   .container {
@@ -81,11 +83,12 @@ $user = current_user();
   }
   
   body.dark-theme .card {
-    border:1px solid rgba(124, 58, 237, 0.3);
-    background: linear-gradient(135deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.02) 100%);
+    border:1px solid rgba(186, 85, 211, 0.35);
+    background: linear-gradient(135deg, rgba(42, 21, 53, 0.85) 0%, rgba(58, 29, 68, 0.75) 100%);
+    backdrop-filter: blur(10px);
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 105, 180, 0.2);
   }
   
   .card:hover {
@@ -97,10 +100,11 @@ $user = current_user();
   }
   
   body.dark-theme .card:hover {
+    transform: translateY(-2px);
     box-shadow: 
-      0 12px 40px rgba(124, 58, 237, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    border-color: rgba(124, 58, 237, 0.5);
+      0 12px 40px rgba(186, 85, 211, 0.35),
+      inset 0 1px 0 rgba(255, 105, 180, 0.3);
+    border-color: rgba(186, 85, 211, 0.55);
   }
   
   .wrap .card h2 {
@@ -124,7 +128,7 @@ $user = current_user();
   }
   
   body.dark-theme .wrap .card h3 {
-    color: #ffd2f0;
+    color: #f5b6e8;
   }
   
   .eg-grid{
@@ -151,9 +155,9 @@ $user = current_user();
   }
   
   body.dark-theme .btn {
-    border:1px solid rgba(124, 58, 237, 0.4);
-    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    border:1px solid rgba(186, 85, 211, 0.45);
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    box-shadow: 0 4px 12px rgba(186, 85, 211, 0.35);
   }
   
   .btn::before {
@@ -181,8 +185,8 @@ $user = current_user();
   }
   
   body.dark-theme .btn:hover {
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
-    border-color: rgba(124, 58, 237, 0.6);
+    box-shadow: 0 6px 20px rgba(186, 85, 211, 0.5);
+    border-color: rgba(186, 85, 211, 0.65);
   }
   
   .btn:active {
@@ -196,9 +200,9 @@ $user = current_user();
   }
   
   body.dark-theme .btn.active {
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%) !important;
-    box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.3);
-    border-color: rgba(255, 107, 157, 0.6);
+    background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%) !important;
+    box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.4);
+    border-color: rgba(255, 105, 180, 0.7);
   }
   
   .small{
@@ -210,6 +214,7 @@ $user = current_user();
   
   body.dark-theme .small {
     color:#d4b5d7;
+    opacity: 0.9;
   }
   
   .out{
@@ -225,9 +230,9 @@ $user = current_user();
   }
   
   body.dark-theme .out {
-    background: rgba(139, 92, 246, 0.1);
-    border:1px solid rgba(139, 92, 246, 0.2);
-    color:#f5e8ff;
+    background: rgba(186, 85, 211, 0.15);
+    border:1px solid rgba(186, 85, 211, 0.3);
+    color:#f5d7f5;
   }
   
   .row{
@@ -251,10 +256,10 @@ $user = current_user();
   }
   
   body.dark-theme .chip {
-    border:1px solid rgba(255, 107, 157, 0.4);
-    background: linear-gradient(135deg, rgba(255, 107, 157, 0.2) 0%, rgba(196, 69, 105, 0.2) 100%);
-    box-shadow: 0 2px 8px rgba(255, 107, 157, 0.2);
-    color:#ffd2f0;
+    border:1px solid rgba(255, 105, 180, 0.45);
+    background: linear-gradient(135deg, rgba(255, 105, 180, 0.22) 0%, rgba(186, 85, 211, 0.22) 100%);
+    box-shadow: 0 2px 8px rgba(255, 105, 180, 0.25);
+    color:#f5b6e8;
   }
   
   .chip:hover {
@@ -263,7 +268,7 @@ $user = current_user();
   }
   
   body.dark-theme .chip:hover {
-    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.4);
+    box-shadow: 0 4px 12px rgba(255, 105, 180, 0.45);
   }
   
   .timer{
@@ -291,8 +296,8 @@ $user = current_user();
   }
   
   body.dark-theme input[type="checkbox"] {
-    border: 2px solid rgba(124, 58, 237, 0.5);
-    background: transparent;
+    border: 2px solid rgba(186, 85, 211, 0.55);
+    background: rgba(42, 21, 53, 0.5);
   }
   
   input[type="checkbox"]:checked {
@@ -301,8 +306,8 @@ $user = current_user();
   }
   
   body.dark-theme input[type="checkbox"]:checked {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    border-color: #7c3aed;
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    border-color: #9b59b6;
   }
   
   input[type="checkbox"]:checked::after {
@@ -326,11 +331,11 @@ $user = current_user();
   }
   
   body.dark-theme a {
-    color: #ffd2f0;
+    color: #f5b6e8;
   }
   
   body.dark-theme a:hover {
-    color: #ff6b9d;
+    color: #ff69b4;
   }
   
   /* Selection */
@@ -366,9 +371,9 @@ $user = current_user();
   }
   
   body.dark-theme .theme-toggle {
-    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-    border: 1px solid rgba(124, 58, 237, 0.4);
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    border: 1px solid rgba(186, 85, 211, 0.5);
+    box-shadow: 0 4px 15px rgba(186, 85, 211, 0.45);
   }
   
   .theme-toggle:hover {
@@ -377,7 +382,7 @@ $user = current_user();
   }
   
   body.dark-theme .theme-toggle:hover {
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+    box-shadow: 0 6px 20px rgba(186, 85, 211, 0.65);
   }
   
   .theme-toggle-icon {
