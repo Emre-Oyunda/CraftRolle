@@ -11,17 +11,17 @@ $user = current_user();
 <title><?= e(APP_NAME) ?> — Eğlence</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
-  /* Eğlence sayfası özel stilleri - Modern & Güzel */
+  /* Eğlence sayfası özel stilleri - Soft Pastel Pink-Purple */
   body{
-    background: linear-gradient(135deg, #0e0b1a 0%, #1a0e2e 50%, #0e0b1a 100%);
-    color:#f5e8ff;
+    background: linear-gradient(135deg, #fef5ff 0%, #fff0f9 25%, #f8f0ff 50%, #fff5fb 75%, #fef5ff 100%);
+    color:#5a3d5c;
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
     margin:0;
     min-height:100vh;
     position:relative;
   }
   
-  /* Animated background particles */
+  /* Soft background particles */
   body::before {
     content: '';
     position: fixed;
@@ -30,9 +30,9 @@ $user = current_user();
     width: 100%;
     height: 100%;
     background-image: 
-      radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 107, 157, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+      radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(221, 160, 221, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.1) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
   }
@@ -51,24 +51,24 @@ $user = current_user();
   }
   
   .card{
-    border:1px solid rgba(124, 58, 237, 0.3);
+    border:1px solid rgba(255, 182, 193, 0.4);
     border-radius:20px;
     padding:24px;
-    background: linear-gradient(135deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.02) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 250, 253, 0.8) 100%);
     backdrop-filter: blur(10px);
     margin-bottom:20px;
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      0 4px 20px rgba(221, 160, 221, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
     transition: all 0.3s ease;
   }
   
   .card:hover {
     transform: translateY(-2px);
     box-shadow: 
-      0 12px 40px rgba(124, 58, 237, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    border-color: rgba(124, 58, 237, 0.5);
+      0 8px 30px rgba(255, 182, 193, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+    border-color: rgba(255, 182, 193, 0.6);
   }
   
   .wrap .card h2 {
@@ -82,7 +82,7 @@ $user = current_user();
   }
   
   .wrap .card h3 {
-    color: #ffd2f0;
+    color: #8b5a8e;
     font-size: 1.3em;
     margin: 0 0 16px 0;
     font-weight: 600;
@@ -99,16 +99,16 @@ $user = current_user();
   
   .btn{
     padding:12px 20px;
-    border:1px solid rgba(124, 58, 237, 0.4);
+    border:1px solid rgba(255, 182, 193, 0.5);
     border-radius:12px;
-    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    background: linear-gradient(135deg, #dda0dd 0%, #d8a0d8 100%);
     color:#fff !important;
     cursor:pointer;
     text-decoration:none;
     display:inline-block;
     font-weight:500;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 3px 10px rgba(221, 160, 221, 0.3);
     position: relative;
     overflow: hidden;
   }
@@ -121,7 +121,7 @@ $user = current_user();
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
@@ -133,8 +133,8 @@ $user = current_user();
   
   .btn:hover{
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
-    border-color: rgba(124, 58, 237, 0.6);
+    box-shadow: 0 5px 18px rgba(221, 160, 221, 0.4);
+    border-color: rgba(255, 182, 193, 0.7);
   }
   
   .btn:active {
@@ -142,15 +142,16 @@ $user = current_user();
   }
   
   .btn.active{
-    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%) !important;
-    box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.3);
-    border-color: rgba(255, 107, 157, 0.6);
+    background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 100%) !important;
+    box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.4);
+    border-color: rgba(255, 182, 193, 0.8);
   }
   
   .small{
-    opacity:.75;
+    opacity:.8;
     font-size:0.9em;
     line-height:1.6;
+    color:#7a5c7d;
   }
   
   .out{
@@ -158,10 +159,11 @@ $user = current_user();
     margin:16px 0;
     font-weight:600;
     padding:12px;
-    background: rgba(139, 92, 246, 0.1);
+    background: rgba(255, 182, 193, 0.12);
     border-radius:12px;
-    border:1px solid rgba(139, 92, 246, 0.2);
+    border:1px solid rgba(221, 160, 221, 0.25);
     line-height:1.6;
+    color:#5a3d5c;
   }
   
   .row{
@@ -173,26 +175,27 @@ $user = current_user();
   }
   
   .chip{
-    border:1px solid rgba(255, 107, 157, 0.4);
+    border:1px solid rgba(255, 182, 193, 0.5);
     border-radius:999px;
     padding:10px 18px;
     font-size:1rem;
-    background: linear-gradient(135deg, rgba(255, 107, 157, 0.2) 0%, rgba(196, 69, 105, 0.2) 100%);
+    background: linear-gradient(135deg, rgba(255, 182, 193, 0.25) 0%, rgba(221, 160, 221, 0.25) 100%);
     font-weight:600;
-    box-shadow: 0 2px 8px rgba(255, 107, 157, 0.2);
+    box-shadow: 0 2px 8px rgba(221, 160, 221, 0.2);
     transition: all 0.3s ease;
+    color:#5a3d5c;
   }
   
   .chip:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.4);
+    box-shadow: 0 3px 12px rgba(255, 182, 193, 0.35);
   }
   
   .timer{
     font-variant-numeric:tabular-nums;
     font-size:2rem;
     font-weight:700;
-    background: linear-gradient(135deg, #ffd2f0, #ff6b9d);
+    background: linear-gradient(135deg, #dda0dd, #ffb6c1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -214,9 +217,9 @@ $user = current_user();
     appearance: none;
     width: 20px;
     height: 20px;
-    border: 2px solid rgba(124, 58, 237, 0.5);
+    border: 2px solid rgba(221, 160, 221, 0.6);
     border-radius: 4px;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.8);
     cursor: pointer;
     position: relative;
     transition: all 0.3s ease;
@@ -224,8 +227,8 @@ $user = current_user();
   }
   
   input[type="checkbox"]:checked {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    border-color: #7c3aed;
+    background: linear-gradient(135deg, #dda0dd, #ffb6c1);
+    border-color: #ffb6c1;
   }
   
   input[type="checkbox"]:checked::after {
@@ -261,8 +264,17 @@ $user = current_user();
   
   /* Selection color */
   ::selection {
-    background: rgba(255, 107, 157, 0.3);
-    color: #fff;
+    background: rgba(255, 182, 193, 0.4);
+    color: #5a3d5c;
+  }
+  
+  /* Link colors */
+  a {
+    color: #c084c0;
+  }
+  
+  a:hover {
+    color: #d8a0d8;
   }
 </style>
 </head><body>
