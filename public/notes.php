@@ -8,6 +8,8 @@ require_login();
 
 $uid = $_SESSION['user_id'] ?? null;
 $created_note = null;
+$notes = [];
+$notesCount = 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
@@ -32,6 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $user = current_user();
+
+if ($uid) {
+    $st = db()->prepare('SELECT n.*, b.title AS book_title FROM notes n LEFT JOIN books b ON n.book_id = b.id WHERE n.user_id = ? AND n.is_deleted = 0 ORDER BY n.updated_at DESC');
+    $st->execute([$uid]);
+    $notes = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $notesCount = count($notes);
+}
 ?>
 <!doctype html>
 <html lang="tr">
@@ -193,8 +202,22 @@ $user = current_user();
   .notes-page .menu {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 18px;
     flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .notes-page .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .notes-page .nav-divider {
+    display: inline-flex;
+    width: 1px;
+    height: 26px;
+    background: var(--divider);
+    margin: 0 4px;
   }
   .notes-page .nav-link {
     padding: 8px 14px;
@@ -202,7 +225,7 @@ $user = current_user();
     color: var(--muted-color);
     font-weight: 500;
     position: relative;
-    transition: color 0.2s ease, background 0.2s ease;
+    transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
   .notes-page .nav-link:hover {
     color: var(--text-color);
@@ -213,10 +236,19 @@ $user = current_user();
     background: var(--accent-soft);
     box-shadow: inset 0 0 0 1px rgba(255, 138, 195, 0.35);
   }
+  .notes-page .nav-link.nav-link-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: var(--btn-text);
+    box-shadow: 0 12px 24px var(--accent-shadow);
+  }
+  .notes-page .nav-link.nav-link-primary:hover {
+    color: var(--btn-text);
+    filter: brightness(1.05);
+  }
   .notes-page .theme-toggle {
     display: inline-flex;
     gap: 10px;
-    padding-left: 10px;
+    padding-left: 12px;
     border-left: 1px solid var(--divider);
   }
   .notes-page .btn {
@@ -446,6 +478,118 @@ $user = current_user();
     align-items: center;
     gap: 6px;
   }
+  .notes-page .notes-archive {
+    margin-top: 26px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+  }
+  .notes-page .notes-archive-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .notes-page .notes-archive-head .small {
+    margin: 6px 0 0 0;
+  }
+  .notes-page .notes-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--muted-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .notes-page .notes-count::before {
+    content: "◎";
+    font-size: 0.7rem;
+  }
+  .notes-page .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .notes-page .note-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 138, 195, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    min-height: 180px;
+  }
+  .notes-page .note-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 35px var(--accent-shadow);
+  }
+  .notes-page.theme-dark .note-item {
+    background: rgba(13, 9, 24, 0.8);
+    border-color: rgba(255, 132, 200, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(255, 132, 200, 0.12);
+  }
+  .notes-page .note-item-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .notes-page .note-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+  }
+  .notes-page .note-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--muted-color);
+    white-space: nowrap;
+  }
+  .notes-page.theme-dark .note-tag {
+    background: rgba(255, 132, 200, 0.15);
+    color: rgba(238, 227, 255, 0.7);
+  }
+  .notes-page .note-excerpt {
+    color: var(--muted-color);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .notes-page .note-excerpt.empty {
+    font-style: italic;
+    opacity: 0.7;
+  }
+  .notes-page .note-meta {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--muted-color);
+  }
+  .notes-page .notes-empty {
+    padding: 20px;
+    border-radius: 16px;
+    background: var(--accent-soft);
+    border: 1px dashed rgba(255, 138, 195, 0.4);
+    color: var(--muted-color);
+  }
   .notes-page .submit-row {
     margin-top: 24px;
     display: flex;
@@ -499,12 +643,18 @@ $user = current_user();
       width: 100%;
       justify-content: space-between;
     }
+    .notes-page .nav-links {
+      justify-content: flex-start;
+    }
     .notes-page .theme-toggle {
       padding-left: 0;
       border-left: none;
       width: 100%;
       justify-content: flex-start;
       gap: 12px;
+    }
+    .notes-page .notes-grid {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
   }
   @media (max-width: 640px) {
@@ -519,6 +669,14 @@ $user = current_user();
       flex-direction: column;
       align-items: stretch;
       gap: 10px;
+    }
+    .notes-page .nav-links {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .notes-page .nav-divider {
+      display: none;
     }
     .notes-page .theme-toggle {
       flex-direction: row;
@@ -535,6 +693,9 @@ $user = current_user();
     .notes-page .submit-row .btn {
       width: 100%;
     }
+    .notes-page .notes-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
@@ -548,10 +709,18 @@ $user = current_user();
       <span class="user-chip">Merhaba, <?= e($user['username']) ?></span>
     </div>
     <div class="menu">
-      <a class="nav-link is-active" href="<?= base_url('notes.php') ?>">📝 Not Yaz</a>
-      <a class="nav-link" href="<?= base_url('books.php') ?>">📚 Kitaplar</a>
-      <a class="nav-link" href="<?= base_url('dashboard.php') ?>">📊 Panel</a>
-      <a class="nav-link" href="<?= base_url('logout.php') ?>">🚪 Çıkış</a>
+      <nav class="nav-links" aria-label="Ana menü">
+        <a class="nav-link nav-link-primary is-active" href="<?= base_url('notes.php') ?>">✨ Not Yaz</a>
+        <a class="nav-link" href="#notes-archive">📒 Notlarım</a>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <a class="nav-link" href="<?= base_url('dashboard.php') ?>">📊 Panel</a>
+        <a class="nav-link" href="<?= base_url('books.php') ?>">📚 Kitaplarım</a>
+        <a class="nav-link" href="<?= base_url('eglence.php') ?>">🎉 Eğlence</a>
+        <a class="nav-link" href="<?= base_url('designer_cover.php') ?>">🎨 Kapak</a>
+        <a class="nav-link" href="<?= base_url('designer_map.php') ?>">🗺 Harita</a>
+        <a class="nav-link" href="<?= base_url('../profil/profil_advanced.php' . ($user ? '?id=' . $user['id'] : '')) ?>">👤 Profilim</a>
+        <a class="nav-link" href="<?= base_url('logout.php') ?>">🚪 Çıkış</a>
+      </nav>
       <div class="theme-toggle" role="group" aria-label="Tema seçimleri">
         <button type="button" class="btn btn-ghost theme-btn is-active" data-theme-btn="pink">Pembe Tema</button>
         <button type="button" class="btn btn-ghost theme-btn" data-theme-btn="dark">Siyah Tema</button>
@@ -634,6 +803,61 @@ $user = current_user();
       <?php endif; ?>
     </div>
   </div>
+
+  <section id="notes-archive" class="card notes-archive">
+    <div class="notes-archive-head">
+      <div>
+        <h2>Notlarım</h2>
+        <p class="small">Tüm notların en güncelden eskiye sıralanıyor.</p>
+      </div>
+      <span class="notes-count"><?= e(number_format($notesCount, 0, ',', '.')) ?> not</span>
+    </div>
+    <?php if (!$notesCount): ?>
+      <div class="notes-empty">
+        Henüz kaydedilmiş not yok. Sol taraftan yazdığın ilk not burada listelenmeye başlayacak.
+      </div>
+    <?php else: ?>
+      <div class="notes-grid">
+        <?php foreach ($notes as $note): ?>
+          <?php
+            $plain = trim(preg_replace('/\s+/', ' ', strip_tags($note['content'] ?? '')));
+            if ($plain === '') {
+                $excerpt = '';
+                $hasMore = false;
+            } else {
+                if (function_exists('mb_substr')) {
+                    $excerpt = mb_substr($plain, 0, 160, 'UTF-8');
+                    $hasMore = function_exists('mb_strlen') ? mb_strlen($plain, 'UTF-8') > 160 : strlen($plain) > 160;
+                } else {
+                    $excerpt = substr($plain, 0, 160);
+                    $hasMore = strlen($plain) > 160;
+                }
+                if ($hasMore) {
+                    $excerpt .= '…';
+                }
+            }
+            $displayDate = $note['updated_at'] ?? ($note['created_at'] ?? 'now');
+          ?>
+          <article class="note-item">
+            <div class="note-item-head">
+              <h3 class="note-title"><?= e($note['title']) ?></h3>
+              <?php if (!empty($note['book_title'])): ?>
+                <span class="note-tag">📚 <?= e($note['book_title']) ?></span>
+              <?php endif; ?>
+            </div>
+            <?php if ($excerpt !== ''): ?>
+              <p class="note-excerpt"><?= e($excerpt) ?></p>
+            <?php else: ?>
+              <p class="note-excerpt empty">İçerik henüz eklenmemiş.</p>
+            <?php endif; ?>
+            <div class="note-meta">
+              <span class="note-date">🕒 <?= e(date('d.m.Y H:i', strtotime($displayDate))) ?></span>
+            </div>
+          </article>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+  </section>
 
   <div class="footer">
     © <?= date('Y') ?> <?= e(APP_NAME) ?> · Üretkenliğin için tasarlandı.
