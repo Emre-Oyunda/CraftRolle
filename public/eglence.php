@@ -11,9 +11,9 @@ $user = current_user();
 <title><?= e(APP_NAME) ?> — Eğlence</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
-  /* === DUAL THEME SYSTEM - Pink & Dark === */
+  /* === DUAL THEME - Pembe & Siyah === */
   
-  /* LIGHT THEME (Default - Pastel Pink) */
+  /* PEMBE TEMA (Default - Pastel) */
   body {
     background: linear-gradient(135deg, #fef5ff 0%, #fff0f9 25%, #f8f0ff 50%, #fff5fb 75%, #fef5ff 100%);
     color:#5a3d5c;
@@ -38,21 +38,16 @@ $user = current_user();
     pointer-events: none;
     z-index: 0;
     transition: all 0.5s ease;
-    opacity: 1;
   }
   
-  /* DARK THEME - Mor-Siyah Arka Plan */
+  /* SİYAH TEMA - İlk kodundaki arka plan */
   body.dark-theme {
-    background: linear-gradient(135deg, #0e0b1a 0%, #1a0e2e 25%, #2a1535 50%, #1a0e2e 75%, #0e0b1a 100%);
+    background: #0e0b1a;
     color:#f5e8ff;
   }
   
   body.dark-theme::before {
-    background-image: 
-      radial-gradient(circle at 20% 50%, rgba(255, 105, 180, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(186, 85, 211, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 40% 20%, rgba(221, 160, 221, 0.08) 0%, transparent 50%);
-    opacity: 1;
+    opacity: 0;
   }
   
   .container {
@@ -68,7 +63,7 @@ $user = current_user();
     z-index:1;
   }
   
-  /* CARDS */
+  /* === KARTLAR === */
   .card{
     border:1px solid rgba(255, 182, 193, 0.4);
     border-radius:20px;
@@ -83,12 +78,11 @@ $user = current_user();
   }
   
   body.dark-theme .card {
-    border:1px solid rgba(186, 85, 211, 0.35);
-    background: linear-gradient(135deg, rgba(42, 21, 53, 0.85) 0%, rgba(58, 29, 68, 0.75) 100%);
-    backdrop-filter: blur(10px);
+    border:1px solid #2a2144;
+    background: rgba(255,255,255,.04);
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 rgba(255, 105, 180, 0.2);
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      inset 0 0 20px rgba(124, 58, 237, 0.05);
   }
   
   .card:hover {
@@ -102,9 +96,9 @@ $user = current_user();
   body.dark-theme .card:hover {
     transform: translateY(-2px);
     box-shadow: 
-      0 12px 40px rgba(186, 85, 211, 0.35),
-      inset 0 1px 0 rgba(255, 105, 180, 0.3);
-    border-color: rgba(186, 85, 211, 0.55);
+      0 8px 24px rgba(124, 58, 237, 0.25),
+      inset 0 0 30px rgba(124, 58, 237, 0.1);
+    border-color: #3a2a54;
   }
   
   .wrap .card h2 {
@@ -128,7 +122,7 @@ $user = current_user();
   }
   
   body.dark-theme .wrap .card h3 {
-    color: #f5b6e8;
+    color: #ffd2f0;
   }
   
   .eg-grid{
@@ -137,7 +131,7 @@ $user = current_user();
     grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
   }
   
-  /* BUTTONS */
+  /* === BUTONLAR === */
   .btn{
     padding:12px 20px;
     border:1px solid rgba(255, 182, 193, 0.5);
@@ -155,9 +149,11 @@ $user = current_user();
   }
   
   body.dark-theme .btn {
-    border:1px solid rgba(186, 85, 211, 0.45);
-    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-    box-shadow: 0 4px 12px rgba(186, 85, 211, 0.35);
+    border:1px solid #2a2144;
+    background: #161226;
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 1px rgba(124, 58, 237, 0.2);
   }
   
   .btn::before {
@@ -185,8 +181,10 @@ $user = current_user();
   }
   
   body.dark-theme .btn:hover {
-    box-shadow: 0 6px 20px rgba(186, 85, 211, 0.5);
-    border-color: rgba(186, 85, 211, 0.65);
+    box-shadow: 
+      0 4px 12px rgba(124, 58, 237, 0.4),
+      inset 0 1px 1px rgba(124, 58, 237, 0.3);
+    border-color: #3a2a54;
   }
   
   .btn:active {
@@ -200,9 +198,10 @@ $user = current_user();
   }
   
   body.dark-theme .btn.active {
-    background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%) !important;
-    box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.4);
-    border-color: rgba(255, 105, 180, 0.7);
+    background: #1f1636 !important;
+    outline: 2px solid #7c3aed;
+    box-shadow: 0 0 0 2px rgba(124,58,237,.25) inset, 0 0 20px rgba(124,58,237,0.4);
+    border-color: #7c3aed;
   }
   
   .small{
@@ -213,8 +212,8 @@ $user = current_user();
   }
   
   body.dark-theme .small {
-    color:#d4b5d7;
-    opacity: 0.9;
+    opacity: 0.85;
+    color: #d4b5d7;
   }
   
   .out{
@@ -230,9 +229,12 @@ $user = current_user();
   }
   
   body.dark-theme .out {
-    background: rgba(186, 85, 211, 0.15);
-    border:1px solid rgba(186, 85, 211, 0.3);
-    color:#f5d7f5;
+    min-height:28px;
+    margin:6px 0;
+    font-weight:600;
+    background: rgba(124, 58, 237, 0.08);
+    border:1px solid rgba(124, 58, 237, 0.2);
+    color:#f5e8ff;
   }
   
   .row{
@@ -241,6 +243,10 @@ $user = current_user();
     flex-wrap:wrap;
     align-items:center;
     margin:12px 0;
+  }
+  
+  body.dark-theme .row {
+    gap:8px;
   }
   
   .chip{
@@ -256,10 +262,15 @@ $user = current_user();
   }
   
   body.dark-theme .chip {
-    border:1px solid rgba(255, 105, 180, 0.45);
-    background: linear-gradient(135deg, rgba(255, 105, 180, 0.22) 0%, rgba(186, 85, 211, 0.22) 100%);
-    box-shadow: 0 2px 8px rgba(255, 105, 180, 0.25);
-    color:#f5b6e8;
+    border:1px solid #2a2144;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:.95rem;
+    background: #0f0c1e;
+    box-shadow: 
+      0 2px 6px rgba(0, 0, 0, 0.3),
+      inset 0 0 10px rgba(124, 58, 237, 0.1);
+    color:#ffd2f0;
   }
   
   .chip:hover {
@@ -268,7 +279,10 @@ $user = current_user();
   }
   
   body.dark-theme .chip:hover {
-    box-shadow: 0 4px 12px rgba(255, 105, 180, 0.45);
+    transform: scale(1.05);
+    box-shadow: 
+      0 3px 10px rgba(124, 58, 237, 0.4),
+      inset 0 0 15px rgba(124, 58, 237, 0.15);
   }
   
   .timer{
@@ -279,6 +293,15 @@ $user = current_user();
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+  
+  body.dark-theme .timer {
+    font-variant-numeric:tabular-nums;
+    font-size:1.6rem;
+    font-weight:700;
+    color: #ffd2f0;
+    background: none;
+    -webkit-text-fill-color: currentColor;
   }
   
   /* Checkbox */
@@ -296,8 +319,8 @@ $user = current_user();
   }
   
   body.dark-theme input[type="checkbox"] {
-    border: 2px solid rgba(186, 85, 211, 0.55);
-    background: rgba(42, 21, 53, 0.5);
+    border: 2px solid #2a2144;
+    background: #0f0c1e;
   }
   
   input[type="checkbox"]:checked {
@@ -306,8 +329,8 @@ $user = current_user();
   }
   
   body.dark-theme input[type="checkbox"]:checked {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    border-color: #9b59b6;
+    background: #7c3aed;
+    border-color: #7c3aed;
   }
   
   input[type="checkbox"]:checked::after {
@@ -324,6 +347,7 @@ $user = current_user();
   /* Links */
   a {
     color: #c084c0;
+    transition: all 0.2s ease;
   }
   
   a:hover {
@@ -331,7 +355,7 @@ $user = current_user();
   }
   
   body.dark-theme a {
-    color: #f5b6e8;
+    color: #ffd2f0;
   }
   
   body.dark-theme a:hover {
@@ -345,11 +369,11 @@ $user = current_user();
   }
   
   body.dark-theme ::selection {
-    background: rgba(255, 107, 157, 0.3);
+    background: rgba(124, 58, 237, 0.3);
     color: #fff;
   }
   
-  /* Theme Toggle Button */
+  /* === THEME TOGGLE BUTTON === */
   .theme-toggle {
     position: fixed;
     top: 20px;
@@ -371,9 +395,11 @@ $user = current_user();
   }
   
   body.dark-theme .theme-toggle {
-    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-    border: 1px solid rgba(186, 85, 211, 0.5);
-    box-shadow: 0 4px 15px rgba(186, 85, 211, 0.45);
+    background: #161226;
+    border: 1px solid #2a2144;
+    box-shadow: 
+      0 4px 15px rgba(0, 0, 0, 0.4),
+      inset 0 0 20px rgba(124, 58, 237, 0.15);
   }
   
   .theme-toggle:hover {
@@ -382,7 +408,10 @@ $user = current_user();
   }
   
   body.dark-theme .theme-toggle:hover {
-    box-shadow: 0 6px 20px rgba(186, 85, 211, 0.65);
+    box-shadow: 
+      0 6px 20px rgba(124, 58, 237, 0.4),
+      inset 0 0 30px rgba(124, 58, 237, 0.25);
+    border-color: #3a2a54;
   }
   
   .theme-toggle-icon {
@@ -424,7 +453,7 @@ $user = current_user();
 </button>
 
 <script>
-// === THEME SWITCHER - Global scope ===
+// === THEME SWITCHER ===
 function toggleTheme() {
   const body = document.body;
   const icon = document.getElementById('theme-icon');
@@ -443,7 +472,7 @@ function toggleTheme() {
   }
 }
 
-// Load saved theme on page load
+// Load saved theme
 (function() {
   const savedTheme = localStorage.getItem('eglence-theme');
   if (savedTheme === 'dark') {
@@ -453,7 +482,7 @@ function toggleTheme() {
   }
 })();
 
-// Attach click event
+// Attach event
 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 </script>
 
@@ -811,7 +840,7 @@ document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
       const olay  = Deck(LS_STATE+'_olay',  lists.olay);
 
       const prevSig = jget(LS_SIG, null);
-      if(prevSig !== sig){ // havuz değişmiş → resetle
+      if(prevSig !== sig){
         yer.reset(); zaman.reset(); hava.reset(); olay.reset();
         jset(LS_SIG, sig);
       }
@@ -952,7 +981,5 @@ document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
   })();
 
 })();
-
-
 </script>
 </body></html>
