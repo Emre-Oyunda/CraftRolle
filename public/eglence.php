@@ -175,20 +175,20 @@ $user = current_user();
   }
   
   .chip{
-    border:1px solid rgba(255, 182, 193, 0.5);
+    border:1px solid rgba(186, 85, 211, 0.5);
     border-radius:999px;
     padding:10px 18px;
     font-size:1rem;
-    background: linear-gradient(135deg, rgba(255, 182, 193, 0.25) 0%, rgba(221, 160, 221, 0.25) 100%);
+    background: linear-gradient(135deg, rgba(186, 85, 211, 0.25) 0%, rgba(147, 112, 219, 0.25) 100%);
     font-weight:600;
-    box-shadow: 0 2px 8px rgba(221, 160, 221, 0.2);
+    box-shadow: 0 2px 8px rgba(186, 85, 211, 0.3);
     transition: all 0.3s ease;
-    color:#5a3d5c;
+    color:#f5d7f5;
   }
   
   .chip:hover {
     transform: scale(1.05);
-    box-shadow: 0 3px 12px rgba(255, 182, 193, 0.35);
+    box-shadow: 0 4px 12px rgba(255, 105, 180, 0.4);
   }
   
   .timer{
@@ -276,8 +276,62 @@ $user = current_user();
   a:hover {
     color: #d8a0d8;
   }
+  
+  body.dark-theme a {
+    color: #ffd2f0;
+  }
+  
+  body.dark-theme a:hover {
+    color: #ff6b9d;
+  }
+  
+  /* Theme Toggle Button */
+  .theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #dda0dd 0%, #d8a0d8 100%);
+    border: 1px solid rgba(255, 182, 193, 0.5);
+    border-radius: 50px;
+    padding: 10px 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(221, 160, 221, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: white;
+  }
+  
+  body.dark-theme .theme-toggle {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+  }
+  
+  .theme-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(221, 160, 221, 0.5);
+  }
+  
+  body.dark-theme .theme-toggle:hover {
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+  }
+  
+  .theme-toggle-icon {
+    font-size: 18px;
+  }
 </style>
 </head><body>
+
+<!-- Theme Toggle Button -->
+<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+  <span class="theme-toggle-icon" id="theme-icon">🌸</span>
+  <span id="theme-text">Pembe</span>
+</button>
+
 <div class="container">
   <div class="card header">
     <div><a class="btn" href="<?= base_url('index.php') ?>" style="text-decoration:none;">🌸 <span class="brand"><?= e(APP_NAME) ?></span></a></div>
@@ -773,5 +827,35 @@ $user = current_user();
   })();
 
 })();
+
+// === THEME SWITCHER ===
+function toggleTheme() {
+  const body = document.body;
+  const icon = document.getElementById('theme-icon');
+  const text = document.getElementById('theme-text');
+  
+  body.classList.toggle('dark-theme');
+  
+  if (body.classList.contains('dark-theme')) {
+    icon.textContent = '🌙';
+    text.textContent = 'Siyah';
+    localStorage.setItem('eglence-theme', 'dark');
+  } else {
+    icon.textContent = '🌸';
+    text.textContent = 'Pembe';
+    localStorage.setItem('eglence-theme', 'light');
+  }
+}
+
+// Load saved theme on page load
+(function() {
+  const savedTheme = localStorage.getItem('eglence-theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    document.getElementById('theme-icon').textContent = '🌙';
+    document.getElementById('theme-text').textContent = 'Siyah';
+  }
+})();
+
 </script>
 </body></html>
