@@ -59,12 +59,10 @@
 
   const objectIcons = {
     tree: '🌲',
-    village: '🏘️',
-    castle: '🏰',
-    harbor: '⚓',
-    tower: '🗼',
-    monument: '🗿',
-    ship: '🚢'
+    house: '🏠',
+    rock: '🪨',
+    river: '🌊',
+    castle: '🏰'
   };
 
   const state = {
