@@ -214,6 +214,34 @@ $qtab = fn(string $t) => '?tab=' . $t;
     box-shadow: 0 30px 70px rgba(9, 7, 20, 0.68);
   }
 
+  .hero-card {
+    display: grid;
+    gap: 16px;
+  }
+
+  .hero-card h1 {
+    margin: 0;
+    font-size: clamp(1.9rem, 3vw, 2.5rem);
+    letter-spacing: -0.02em;
+  }
+
+  .hero-card p {
+    margin: 0;
+    max-width: 640px;
+    line-height: 1.65;
+    color: var(--text-muted);
+  }
+
+  body.profile-page.dark-mode .hero-card p {
+    color: rgba(236, 224, 255, 0.72);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
   .profile-header {
     display: flex;
     flex-wrap: wrap;
