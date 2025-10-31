@@ -1,33 +1,14 @@
 <?php
-// public/notes.php — Not yaz + sağda önizleme + otomatik taslak
 require_once __DIR__ . '/../src/config.php';
 require_once __DIR__ . '/../src/helpers.php';
 require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/csrf.php';
 
 require_login();
 
 $uid = $_SESSION['user_id'] ?? null;
-$created_note = null;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  csrf_check();
-
-  $title = trim($_POST['title'] ?? 'Not');
-
-  // 1) JS'nin doldurduğu hidden 'content'
-  // 2) JS çalışmasa bile fallback textarea
-  $content = $_POST['content'] ?? '';
-  if ($content === '') { $content = $_POST['rte_fallback'] ?? ''; }
-
-  $st = db()->prepare("INSERT INTO notes(user_id,title,content,updated_at) VALUES(?,?,?,?)");
-  $st->execute([$uid, $title, $content, date('c')]);
-
-  $id = (int) db()->lastInsertId();
-  $st = db()->prepare("SELECT * FROM notes WHERE id=? AND user_id=?");
-  $st->execute([$id, $uid]);
-  $created_note = $st->fetch(PDO::FETCH_ASSOC);
-}
+$st = db()->prepare("SELECT id, title, content, updated_at FROM notes WHERE user_id=? ORDER BY updated_at DESC");
+$st->execute([$uid]);
+$rows = $st->fetchAll(PDO::FETCH_ASSOC);
 
 $user = current_user();
 $currentScript = basename($_SERVER['PHP_SELF'] ?? '');
@@ -41,13 +22,15 @@ $navLinks = [
   ['href' => 'designer_map.php',   'icon' => '🗺️', 'label' => 'Harita Tasarım'],
   ['href' => 'eglence.php',        'icon' => '💡', 'label' => 'Eğlence'],
 ];
+
+$noteCount = count($rows);
 ?>
 <!doctype html>
 <html lang="tr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?= e(APP_NAME) ?> — Not Yaz</title>
+<title><?= e(APP_NAME) ?> — Notlarım</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
   body.notes-page {
@@ -171,8 +154,8 @@ $navLinks = [
 
   .brand-tagline {
     font-size: 0.92rem;
-    opacity: 0.75;
-    max-width: 380px;
+    opacity: 0.72;
+    max-width: 440px;
     line-height: 1.5;
   }
 
@@ -355,241 +338,202 @@ $navLinks = [
     box-shadow: 0 22px 44px rgba(124, 58, 237, 0.4);
   }
 
-  .draft-status {
+  .notes-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .stat-pill {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 16px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    font-size: 0.9rem;
-    color: inherit;
-    margin-left: 4px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-weight: 600;
+    margin-top: 18px;
   }
 
-  body.notes-page.dark-theme .draft-status {
-    background: rgba(23, 18, 39, 0.7);
+  body.notes-page.dark-theme .stat-pill {
+    background: rgba(23, 18, 39, 0.65);
     border: 1px solid rgba(124, 58, 237, 0.3);
   }
 
-  .notes-grid {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    align-items: start;
-  }
-
-  .notes-grid h2 {
-    font-size: 1.4rem;
-    margin-bottom: 12px;
-  }
-
-  .micro-copy {
-    font-size: 0.85rem;
-    opacity: 0.72;
-    margin-top: -6px;
-    margin-bottom: 10px;
-  }
-
-  .notes-form {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .notes-form label {
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.01em;
-  }
-
-  .notes-form input,
-  .notes-form textarea {
-    width: 100%;
-    border-radius: 12px;
-    border: 1px solid rgba(125, 73, 148, 0.22);
-    padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.7);
-    color: inherit;
-    font-size: 1rem;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-  }
-
-  .notes-form input:focus,
-  .notes-form textarea:focus,
-  .rte:focus {
-    outline: none;
-    border-color: rgba(198, 107, 231, 0.6);
-    box-shadow: 0 0 0 4px rgba(198, 107, 231, 0.18);
-    background: rgba(255, 255, 255, 0.85);
-  }
-
-  body.notes-page.dark-theme .notes-form input,
-  body.notes-page.dark-theme .notes-form textarea {
-    background: rgba(21, 16, 34, 0.7);
-    border: 1px solid rgba(124, 58, 237, 0.28);
-  }
-
-  body.notes-page.dark-theme .notes-form input:focus,
-  body.notes-page.dark-theme .notes-form textarea:focus,
-  body.notes-page.dark-theme .rte:focus {
-    border-color: rgba(255, 111, 181, 0.7);
-    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.22);
-    background: rgba(21, 16, 34, 0.9);
-  }
-
-  .toolbar {
-    display: flex;
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
     gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .toolbar .btn {
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, rgba(255, 134, 199, 0.85), rgba(198, 107, 231, 0.85));
-    color: #fff;
-    cursor: pointer;
-    font-weight: 600;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .toolbar .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 18px rgba(198, 107, 231, 0.35);
-  }
-
-  body.notes-page.dark-theme .toolbar .btn {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.8), rgba(255, 111, 181, 0.8));
-  }
-
-  .rte {
-    min-height: 260px;
-    border-radius: 16px;
-    border: 1px solid rgba(125, 73, 148, 0.22);
-    background: rgba(255, 255, 255, 0.75);
-    padding: 16px;
-    color: inherit;
-    line-height: 1.6;
-    font-size: 1rem;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-  }
-
-  .rte p {
-    margin-bottom: 0.8em;
-  }
-
-  body.notes-page.dark-theme .rte {
-    background: rgba(21, 16, 34, 0.78);
-    border: 1px solid rgba(124, 58, 237, 0.3);
-    box-shadow: inset 0 0 0 1px rgba(9, 6, 20, 0.6);
-  }
-
-  .notes-form button[type="submit"] {
-    align-self: flex-start;
     padding: 12px 20px;
-    border-radius: 12px;
-    border: none;
+    border-radius: 14px;
     background: linear-gradient(135deg, #ff7fc7, #c56ae6);
     color: #fff;
     font-weight: 700;
-    cursor: pointer;
+    text-decoration: none;
+    margin-top: 20px;
     box-shadow: 0 16px 30px rgba(197, 106, 230, 0.35);
     transition: transform 0.25s ease, box-shadow 0.3s ease;
   }
 
-  .notes-form button[type="submit"]:hover {
+  .cta-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 22px 42px rgba(197, 106, 230, 0.45);
   }
 
-  body.notes-page.dark-theme .notes-form button[type="submit"] {
+  body.notes-page.dark-theme .cta-btn {
     background: linear-gradient(135deg, #7c3aed, #ff6fb5);
   }
 
-  .preview-card {
+  .note-collection h2 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+  }
+
+  .note-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+
+  .note-search input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: inherit;
+  }
+
+  .note-search input:focus {
+    outline: none;
+  }
+
+  body.notes-page.dark-theme .note-search {
+    background: rgba(18, 14, 36, 0.72);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+  }
+
+  .results-meta {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    margin-bottom: 12px;
+  }
+
+  .note-gallery {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .note-card {
+    position: relative;
+    border-radius: 18px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(250, 220, 255, 0.55);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    text-decoration: none;
+    color: inherit;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.75);
-    padding: 18px;
-    min-height: 340px;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+    min-height: 180px;
   }
 
-  .preview-title {
-    font-weight: 700;
-    font-size: 1.05rem;
+  .note-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px rgba(198, 107, 231, 0.22);
   }
 
-  .preview-content {
-    background: rgba(255, 255, 255, 0.95);
-    color: #2c2436;
-    padding: 16px;
-    border-radius: 12px;
-    max-height: 320px;
-    overflow: auto;
-    font-size: 0.98rem;
-    line-height: 1.65;
-    box-shadow: inset 0 0 0 1px rgba(242, 213, 255, 0.6);
+  body.notes-page.dark-theme .note-card {
+    background: rgba(18, 14, 36, 0.72);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    box-shadow: inset 0 0 0 1px rgba(12, 8, 24, 0.72);
   }
 
-  .preview-content::-webkit-scrollbar {
-    width: 8px;
+  body.notes-page.dark-theme .note-card:hover {
+    box-shadow: 0 22px 48px rgba(124, 58, 237, 0.32);
   }
 
-  .preview-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 12px;
-  }
-
-  .preview-content::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #ff9ed3, #c66be7);
-    border-radius: 12px;
-  }
-
-  .preview-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .note-card .note-date {
     font-size: 0.85rem;
     opacity: 0.75;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
-  .preview-empty {
+  .note-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .note-card p {
+    margin: 0;
     font-size: 0.95rem;
-    opacity: 0.78;
-    background: rgba(255, 255, 255, 0.55);
-    border-radius: 12px;
-    padding: 16px;
     line-height: 1.6;
+    opacity: 0.85;
   }
 
-  body.notes-page.dark-theme .preview-card {
-    background: rgba(21, 16, 36, 0.78);
+  .note-card .note-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-size: 0.78rem;
+    font-weight: 600;
+    align-self: flex-start;
+  }
+
+  body.notes-page.dark-theme .note-card .note-tag {
+    background: rgba(23, 18, 39, 0.65);
     border: 1px solid rgba(124, 58, 237, 0.3);
-    box-shadow: inset 0 0 0 1px rgba(18, 10, 36, 0.6);
   }
 
-  body.notes-page.dark-theme .preview-content {
-    background: rgba(12, 9, 24, 0.92);
-    color: #f3eaff;
-    box-shadow: inset 0 0 0 1px rgba(124, 58, 237, 0.28);
+  .no-results {
+    display: none;
+    padding: 24px 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    font-size: 0.95rem;
+    text-align: center;
   }
 
-  body.notes-page.dark-theme .preview-empty {
-    background: rgba(18, 14, 36, 0.6);
+  body.notes-page.dark-theme .no-results {
+    background: rgba(18, 14, 36, 0.72);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+  }
+
+  .empty-state {
+    display: grid;
+    gap: 14px;
+    text-align: center;
+    padding: 40px 20px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+
+  body.notes-page.dark-theme .empty-state {
+    background: rgba(18, 14, 36, 0.7);
+    border: 1px solid rgba(124, 58, 237, 0.3);
   }
 
   .helper-card {
+    margin-top: 22px;
     display: grid;
     gap: 10px;
-    margin-top: 16px;
   }
 
   .helper-card strong {
@@ -627,7 +571,7 @@ $navLinks = [
   }
 
   @media (max-width: 1100px) {
-    .notes-grid {
+    .notes-overview {
       grid-template-columns: 1fr;
     }
   }
@@ -660,9 +604,8 @@ $navLinks = [
       justify-content: center;
     }
 
-    .notes-form button[type="submit"] {
-      width: 100%;
-      justify-content: center;
+    .notes-overview {
+      gap: 16px;
     }
   }
 </style>
@@ -675,7 +618,7 @@ $navLinks = [
         <span class="brand-icon">🌸</span>
         <span class="brand"><?= e(APP_NAME) ?></span>
       </a>
-      <p class="brand-tagline">Notlarını yaz, pembe & siyah temalar arasında tek dokunuşla geçiş yap.</p>
+      <p class="brand-tagline">Tüm notlarını tek yerde topladık. Tema düğmesi ile pembe ya da siyah rafta görüntüleyebilirsin.</p>
     </div>
     <div class="header-actions">
       <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
@@ -688,7 +631,7 @@ $navLinks = [
         </span>
       </button>
       <?php if ($user): ?>
-        <span class="user-chip">👋 <?= e($user['username']) ?></span>
+        <span class="user-chip">📚 <?= e($user['username']) ?></span>
         <a class="ghost-btn" href="<?= base_url('logout.php') ?>">Çıkış</a>
       <?php endif; ?>
     </div>
@@ -704,69 +647,62 @@ $navLinks = [
     <?php endforeach; ?>
   </nav>
 
-  <div id="draft-status" class="draft-status">💾 Taslak modu hazır</div>
-
-  <div class="notes-grid">
+  <div class="notes-overview">
     <div class="glass-card">
-      <h2>📝 Not Yaz</h2>
-      <p class="micro-copy">Taslaklar otomatik olarak tarayıcınızda saklanır. Kaydetmeden ayrılırsanız bile içerik kaybolmaz.</p>
-      <form method="post" id="note-form" class="notes-form" action="<?= e(base_url('notes.php')) ?>" data-draft-key="notes_draft_user_<?= (int)$uid ?>">
-        <?php csrf_field(); ?>
-
-        <div class="toolbar">
-          <button type="button" class="btn" data-cmd="bold" title="Kalın">B</button>
-          <button type="button" class="btn" data-cmd="italic" title="İtalik"><i>İ</i></button>
-          <button type="button" class="btn" data-cmd="underline" title="Altı çizili"><u>A</u></button>
-          <button type="button" class="btn" data-cmd="h1" title="Başlık">Başlık</button>
-          <button type="button" class="btn" data-cmd="ul" title="Liste">Liste</button>
-        </div>
-
-        <label for="note-title">Başlık</label>
-        <input id="note-title" name="title" type="text" placeholder="Not başlığı" value="<?= isset($_POST['title']) ? e($_POST['title']) : '' ?>">
-
-        <label for="rte">İçerik</label>
-        <div id="rte" class="rte" contenteditable="true" spellcheck="true"></div>
-
-        <input type="hidden" name="content" id="content-hidden">
-        <textarea name="rte_fallback" id="rte-fallback" style="display:none"></textarea>
-
-        <button type="submit">Kaydet</button>
-      </form>
-
-      <noscript class="micro-copy" style="color:#b85b7f;">
-        JavaScript kapalıysa taslak kaydı ve zengin düzenleme çalışmaz.
-      </noscript>
-    </div>
-
-    <div class="glass-card">
-      <h2>👀 Önizleme</h2>
-      <?php if ($created_note): ?>
-        <div class="preview-card">
-          <div class="preview-title"><?= e($created_note['title']) ?></div>
-          <div class="preview-content"><?= $created_note['content'] ?></div>
-          <div class="preview-meta">
-            <span>🗂️ Taslak</span>
-            <span><?= e(date('d.m.Y H:i', strtotime($created_note['updated_at']))) ?></span>
-          </div>
-        </div>
-      <?php else: ?>
-        <div class="preview-card">
-          <div class="preview-empty">
-            💡 İlk notunuzu kaydettiğinizde burada pembe bir önizleme kartı oluşur. Tema düğmesi ile siyah moda geçerek gece yazımı yapabilirsiniz.
-          </div>
-        </div>
-      <?php endif; ?>
+      <h2>📒 Not Arşivin</h2>
+      <p>Güncellediğin tüm notlar ters kronolojik sıralandı. İncelerken tema düğmesi ile ışık/koyu raflar arasında geçiş yapabilirsin.</p>
+      <a class="cta-btn" href="<?= base_url('notes.php') ?>">📝 Yeni Not Yaz</a>
+      <div class="stat-pill">✨ Toplam <?= number_format($noteCount, 0, ',', '.') ?> not</div>
       <div class="helper-card">
-        <strong>🎯 İpucu</strong>
+        <strong>İpuçları</strong>
         <ul>
-          <li><kbd>Ctrl</kbd> + <kbd>B</kbd> ile kalın yapabilirsiniz.</li>
-          <li>Tema düğmesi tercihinizi kaydeder, sayfayı yenileseniz bile aynı kalır.</li>
+          <li>Bir not kartına tıklayarak detay sayfasına geç.</li>
+          <li><kbd>Ctrl</kbd> + <kbd>F</kbd> ile tarayıcı aramasını kullanarak başlık içinde ara.</li>
         </ul>
       </div>
     </div>
+
+    <div class="glass-card note-collection">
+      <h2>🔖 Son Notlar</h2>
+      <?php if (!$rows): ?>
+        <div class="empty-state">
+          <div style="font-size:42px;">🕊️</div>
+          <p>Henüz not eklememişsin. Pembe ilham butonuna basarak ilk notunu yazabilirsin.</p>
+          <a class="cta-btn" href="<?= base_url('notes.php') ?>">📝 İlk Notumu Yaz</a>
+        </div>
+      <?php else: ?>
+        <div class="note-search">
+          <span aria-hidden="true">🔍</span>
+          <input id="note-search" type="search" placeholder="Başlıkta ara...">
+        </div>
+        <div class="results-meta">
+          <span id="results-total">Toplam <?= number_format($noteCount, 0, ',', '.') ?> not</span>
+        </div>
+        <div class="note-gallery" id="note-gallery">
+          <?php foreach ($rows as $note): ?>
+            <?php
+              $updated = strtotime($note['updated_at'] ?? '');
+              $excerpt = trim(strip_tags($note['content'] ?? ''));
+              if (mb_strlen($excerpt) > 120) {
+                $excerpt = mb_substr($excerpt, 0, 117) . '…';
+              }
+            ?>
+            <a class="note-card" href="<?= base_url('note_view.php?id=' . (int) $note['id']) ?>" data-title="<?= e($note['title']) ?>" data-body="<?= e($excerpt) ?>">
+              <div class="note-date">⏱️ <?= $updated ? e(date('d.m.Y H:i', $updated)) : '—' ?></div>
+              <h3><?= e($note['title']) ?></h3>
+              <?php if ($excerpt): ?>
+                <p><?= e($excerpt) ?></p>
+              <?php endif; ?>
+              <span class="note-tag">Görüntüle & düzenle</span>
+            </a>
+          <?php endforeach; ?>
+        </div>
+        <div class="no-results" id="no-results">Aramanıza uygun not bulunamadı.</div>
+      <?php endif; ?>
+    </div>
   </div>
 
-  <div class="footer-note">© <?= date('Y') ?> <?= e(APP_NAME) ?> · Craftrolle not deneyimi</div>
+  <div class="footer-note">© <?= date('Y') ?> <?= e(APP_NAME) ?> · Craftrolle not arşivi</div>
 </div>
 
 <script>
@@ -795,8 +731,45 @@ $navLinks = [
     applyTheme(nextMode);
   });
 })();
-</script>
 
-<script src="../assets/js/notes_editor.js?v=3"></script>
+(function() {
+  const searchInput = document.getElementById('note-search');
+  const gallery = document.getElementById('note-gallery');
+  const totalLabel = document.getElementById('results-total');
+  const noResults = document.getElementById('no-results');
+  if (!searchInput || !gallery) { return; }
+
+  const cards = Array.from(gallery.querySelectorAll('.note-card'));
+  const totalCount = cards.length;
+
+  const updateTotals = (visible) => {
+    if (totalLabel) {
+      totalLabel.textContent = `${visible} / ${totalCount} not`;
+    }
+    if (noResults) {
+      noResults.style.display = visible === 0 ? 'block' : 'none';
+    }
+  };
+
+  const filterNotes = (term) => {
+    const normalized = term.trim().toLowerCase();
+    let visible = 0;
+    cards.forEach(card => {
+      const title = (card.dataset.title || '').toLowerCase();
+      const body = (card.dataset.body || '').toLowerCase();
+      const match = !normalized || title.includes(normalized) || body.includes(normalized);
+      card.style.display = match ? 'flex' : 'none';
+      if (match) { visible += 1; }
+    });
+    updateTotals(visible);
+  };
+
+  searchInput.addEventListener('input', (event) => {
+    filterNotes(event.target.value);
+  });
+
+  filterNotes('');
+})();
+</script>
 </body>
 </html>
