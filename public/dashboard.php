@@ -22,33 +22,55 @@ $user = current_user();
     color:#2b2144;
     padding:48px 18px 80px;
   }
+  body.dashboard-legacy.dark-mode{
+    color:#f5ecff;
+    background:
+      radial-gradient(circle at 14% -12%, rgba(80,64,130,0.55), transparent 55%),
+      radial-gradient(circle at 90% 0%, rgba(210,86,150,0.48), transparent 60%),
+      linear-gradient(135deg,#0f0b1f 0%,#161129 40%,#1f1736 100%);
+  }
   .dashboard-shell{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:24px;position:relative;z-index:1;}
   .card.header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;border-radius:20px;background:rgba(255,255,255,0.82);border:1px solid rgba(255,255,255,0.7);box-shadow:0 22px 46px rgba(120,90,210,0.14);backdrop-filter:blur(18px);}
+  body.dashboard-legacy.dark-mode .card.header{background:rgba(24,21,46,0.92);border-color:rgba(108,92,190,0.38);box-shadow:0 24px 52px rgba(8,6,18,0.7);}
   .brand{background:linear-gradient(120deg,#ff9fdc,#8c74ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;}
   .badge{background:rgba(30,24,52,0.85);border:1px solid rgba(112,94,190,0.32);color:#f7ebff;padding:8px 14px;border-radius:999px;font-weight:600;display:inline-flex;gap:6px;align-items:center;}
   .primary-hero{border-radius:24px;background:rgba(255,255,255,0.86);border:1px solid rgba(255,255,255,0.7);box-shadow:0 24px 52px rgba(120,90,210,0.16);padding:26px 28px;backdrop-filter:blur(18px);}
+  body.dashboard-legacy.dark-mode .primary-hero{background:rgba(24,21,46,0.9);border-color:rgba(108,92,190,0.36);box-shadow:0 26px 60px rgba(8,6,18,0.68);}
   .primary-hero h2{margin:0 0 10px;font-size:clamp(1.8rem,3vw,2.4rem);}
   .primary-hero p{margin:0;color:rgba(43,33,68,0.72);max-width:620px;line-height:1.6;}
+  body.dashboard-legacy.dark-mode .primary-hero p{color:rgba(235,224,255,0.74);}
   .quick-stats{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:18px;}
   .stat-card{border-radius:18px;background:linear-gradient(135deg,rgba(255,190,233,0.22),rgba(190,176,255,0.22));border:1px solid rgba(190,176,255,0.32);padding:18px 20px;display:grid;gap:6px;}
+  body.dashboard-legacy.dark-mode .stat-card{background:rgba(32,29,58,0.88);border-color:rgba(108,92,190,0.36);}
   .stat-card strong{font-size:2.1rem;color:#432a70;}
+  body.dashboard-legacy.dark-mode .stat-card strong{color:#f7ecff;}
   .stat-card span{font-size:0.9rem;color:rgba(43,33,68,0.6);}
+  body.dashboard-legacy.dark-mode .stat-card span{color:rgba(235,224,255,0.66);}
   .grid.g-3{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
   .card.action-card{background:rgba(255,255,255,0.9);border-radius:22px;border:1px solid rgba(255,255,255,0.7);box-shadow:0 18px 42px rgba(120,90,210,0.12);padding:22px;display:grid;gap:12px;}
+  body.dashboard-legacy.dark-mode .card.action-card{background:rgba(28,24,50,0.92);border-color:rgba(108,92,190,0.36);box-shadow:0 20px 48px rgba(8,6,18,0.68);}
   .action-card h3{margin:0;font-size:1.18rem;color:#4b2d78;display:flex;gap:8px;align-items:center;}
+  body.dashboard-legacy.dark-mode .action-card h3{color:#fbd8ff;}
   .action-card p{margin:0;color:rgba(43,33,68,0.68);line-height:1.55;}
+  body.dashboard-legacy.dark-mode .action-card p{color:rgba(235,224,255,0.68);}
   .action-buttons{display:flex;gap:10px;flex-wrap:wrap;}
   .pill-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:14px;text-decoration:none;font-weight:600;background:linear-gradient(120deg,#7c5bff,#f58acb);color:#fff;border:1px solid rgba(124,91,255,0.28);box-shadow:0 20px 42px rgba(124,91,255,0.24);transition:transform 0.24s ease,box-shadow 0.24s ease;}
   .pill-btn:hover{transform:translateY(-2px);box-shadow:0 26px 56px rgba(124,91,255,0.28);}
   .pill-btn.secondary{background:rgba(255,255,255,0.86);color:#2b2144;border:1px solid rgba(124,91,255,0.2);box-shadow:none;}
+  body.dashboard-legacy.dark-mode .pill-btn.secondary{background:rgba(28,24,50,0.88);color:#f5ecff;border-color:rgba(108,92,190,0.38);}
   .theme-toggle{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,0.68);background:linear-gradient(120deg,#fcd9ff,#d6c6ff);font-weight:600;color:#3a295b;cursor:pointer;box-shadow:0 20px 38px rgba(150,110,255,0.24);transition:transform 0.2s ease,box-shadow 0.2s ease;}
   .theme-toggle:hover{transform:translateY(-2px);box-shadow:0 26px 54px rgba(150,110,255,0.28);}
+  body.dashboard-legacy.dark-mode .theme-toggle{background:rgba(26,23,46,0.92);border-color:rgba(108,92,190,0.42);color:#f6ebff;box-shadow:0 20px 48px rgba(8,6,18,0.65);}
   .header .nav-inline{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
   .header .nav-inline a{padding:8px 14px;border-radius:999px;border:1px solid rgba(124,91,255,0.2);background:rgba(255,255,255,0.86);font-weight:600;color:#2b2144;text-decoration:none;}
   .header .nav-inline a:hover{text-decoration:none;box-shadow:0 16px 32px rgba(124,91,255,0.18);}
+  body.dashboard-legacy.dark-mode .header .nav-inline a{background:rgba(28,24,50,0.92);border-color:rgba(108,92,190,0.36);color:#f6ecff;}
   .bottom-nav{position:sticky;bottom:0;display:flex;gap:10px;justify-content:space-around;padding:12px;border-radius:16px;background:rgba(20,17,40,0.18);backdrop-filter:blur(16px);border:1px solid rgba(124,91,255,0.24);margin-top:28px;}
   .bottom-nav a{flex:1;text-align:center;padding:10px;border-radius:12px;background:rgba(255,255,255,0.85);border:1px solid rgba(124,91,255,0.2);color:#2b2144;font-weight:600;text-decoration:none;}
+  body.dashboard-legacy.dark-mode .bottom-nav{background:rgba(8,6,18,0.7);border-color:rgba(108,92,190,0.34);}
+  body.dashboard-legacy.dark-mode .bottom-nav a{background:rgba(28,24,50,0.9);border-color:rgba(108,92,190,0.34);color:#f5ecff;}
   .dashboard-footer{text-align:center;color:rgba(43,33,68,0.62);font-size:0.88rem;margin-top:12px;}
+  body.dashboard-legacy.dark-mode .dashboard-footer{color:rgba(236,224,255,0.58);}
   @media(max-width:720px){body.dashboard-legacy{padding:36px 14px 90px;} .card.header{align-items:flex-start;} .header .nav-inline{width:100%;} .primary-hero{padding:22px;} .bottom-nav{position:fixed;left:14px;right:14px;bottom:18px;}}
 </style>
 </head>
