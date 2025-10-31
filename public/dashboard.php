@@ -6,8 +6,29 @@ require_once __DIR__ . '/../src/auth.php';
 require_login();
 $user = current_user();
 
-$booksCount = (int)db()->query("SELECT COUNT(*) FROM books WHERE user_id = " . (int)$user['id'] . " AND is_deleted = 0")->fetchColumn();
-$notesCount = (int)db()->query("SELECT COUNT(*) FROM notes WHERE user_id = " . (int)$user['id'] . " AND is_deleted = 0")->fetchColumn();
+$booksCount = null;
+$notesCount = null;
+$statsError = null;
+
+if (class_exists(PDO::class)) {
+  try {
+    $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+    $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+      PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
+    ]);
+    $stmtBooks = $pdo->prepare("SELECT COUNT(*) FROM books WHERE user_id = :uid AND is_deleted = 0");
+    $stmtBooks->execute(['uid' => (int)$user['id']]);
+    $booksCount = (int)$stmtBooks->fetchColumn();
+
+    $stmtNotes = $pdo->prepare("SELECT COUNT(*) FROM notes WHERE user_id = :uid AND is_deleted = 0");
+    $stmtNotes->execute(['uid' => (int)$user['id']]);
+    $notesCount = (int)$stmtNotes->fetchColumn();
+  } catch (Throwable $e) {
+    $booksCount = $notesCount = null;
+    $statsError = 'İstatistikler yüklenemedi.';
+  }
+}
 
 $navLinks = [
   ['icon' => '🏠', 'label' => 'Panel', 'href' => 'dashboard.php'],
@@ -471,15 +492,18 @@ function user_initial_dashboard(array $user): string {
       <div class="stats-grid">
         <div class="stats-card">
           <div style="font-size: 1.6rem;">📚</div>
-          <strong><?= $booksCount ?></strong>
+          <strong><?= $booksCount === null ? '—' : e($booksCount) ?></strong>
           <span>aktif kitap</span>
         </div>
         <div class="stats-card">
           <div style="font-size: 1.6rem;">📝</div>
-          <strong><?= $notesCount ?></strong>
+          <strong><?= $notesCount === null ? '—' : e($notesCount) ?></strong>
           <span>kaydedilen not</span>
         </div>
       </div>
+      <?php if ($statsError): ?>
+        <p style="margin:12px 0 0; color: rgba(200, 60, 110, 0.8); font-size:0.92rem;">⚠️ <?= e($statsError) ?></p>
+      <?php endif; ?>
     </section>
 
     <section class="action-grid">
