@@ -1,6 +1,7 @@
 (function() {
   const canvas = document.getElementById('cover-canvas');
   if (!canvas) { return; }
+
   const ctx = canvas.getContext('2d');
   const templateSelect = document.getElementById('template');
   const titleInput = document.getElementById('title-input');
@@ -36,7 +37,7 @@
       }
     },
     scifi: {
-      name: 'Sci-Fi',
+      name: 'Sci-Fi (Neon)',
       gradient: ['#1a0240', '#350a6d', '#0d172f'],
       titleColor: '#79e8ff',
       authorColor: '#9ecaff',
@@ -74,7 +75,7 @@
       }
     },
     fantasy: {
-      name: 'Fantasy',
+      name: 'Fantasy (Büyülü)',
       gradient: ['#261b40', '#512a88', '#a868f0'],
       titleColor: '#ffeec8',
       authorColor: '#ffe0a3',
@@ -101,7 +102,7 @@
       }
     },
     noir: {
-      name: 'Noir',
+      name: 'Noir (Siyah-Beyaz)',
       gradient: ['#0d0d0f', '#1a1a1d', '#050505'],
       titleColor: '#f5f5f5',
       authorColor: '#c9c9c9',
@@ -123,7 +124,7 @@
       }
     },
     nature: {
-      name: 'Nature',
+      name: 'Nature (Doğa)',
       gradient: ['#045255', '#0c8f6d', '#8fcf6b'],
       titleColor: '#f6ffed',
       authorColor: '#def7d2',
@@ -192,17 +193,17 @@
   function drawCover() {
     const key = templateSelect.value;
     const template = templates[key] || templates.romance;
-    const title = titleInput.value || bookTitleFallback();
+    const title = (titleInput.value || bookTitleFallback()).toUpperCase();
     const author = authorInput.value || 'Bilinmeyen Yazar';
 
     drawBackground(template);
     template.accent(ctx);
 
-    ctx.fillStyle = template.titleColor;
     ctx.textAlign = 'center';
+    ctx.fillStyle = template.titleColor;
 
     const titleFont = template.titleFont || 'bold 64px "Playfair Display", serif';
-    const titleLines = wrapText(title.toUpperCase(), width * 0.7, titleFont, 72);
+    const titleLines = wrapText(title, width * 0.7, titleFont, 72);
     const titleStartY = height * 0.35 - ((titleLines.length - 1) * 36);
     titleLines.forEach((line, index) => {
       ctx.font = titleFont;
@@ -222,7 +223,7 @@
 
   function bookTitleFallback() {
     const options = [
-      'Dokunuş', 'Yıldız Tozu', 'Sessiz Rüya', 'Gölgelerin Ötesi', 'Kayıp Bahar', 'Sonsuz Döngü'
+      'Dokunuş', 'Yıldız Tozu', 'Sessiz Rüya', 'Gölgelerin ÖTESİ', 'Kayıp Bahar', 'Sonsuz Döngü'
     ];
     return options[Math.floor(Math.random() * options.length)];
   }
@@ -235,30 +236,58 @@
   titleInput.addEventListener('input', updateCover);
   authorInput.addEventListener('input', updateCover);
 
-  downloadBtn.addEventListener('click', () => {
-    downloadBtn.disabled = true;
-    downloadBtn.textContent = '⌛ Hazırlanıyor...';
-    canvas.toBlob((blob) => {
-      downloadBtn.disabled = false;
-      downloadBtn.textContent = 'PNG Kaydet/Yükle';
-      if (!blob) {
-        if (resultEl) { resultEl.textContent = 'PNG oluşturulamadı, lütfen tekrar deneyin.'; }
-        return;
-      }
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = (titleInput.value || 'craftrolle_kapak') + '.png';
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      if (resultEl) {
+  if (downloadBtn) {
+    const originalLabel = downloadBtn.textContent;
+    downloadBtn.addEventListener('click', () => {
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = '⌛ Hazırlanıyor...';
+
+      const finalize = (message) => {
+        downloadBtn.disabled = false;
+        downloadBtn.textContent = originalLabel;
+        if (resultEl && message) {
+          resultEl.textContent = message;
+        }
+      };
+
+      const saveBlob = (blob) => {
+        if (!blob) {
+          finalize('PNG oluşturulamadı, lütfen tekrar deneyin.');
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = (titleInput.value || 'craftrolle_kapak') + '.png';
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
         const now = new Date();
-        resultEl.textContent = 'PNG indirildi (' + now.toLocaleTimeString('tr-TR') + ')';
+        finalize('PNG indirildi (' + now.toLocaleTimeString('tr-TR') + ')');
+      };
+
+      if (canvas.toBlob) {
+        canvas.toBlob(saveBlob, 'image/png');
+      } else {
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          if (dataUrl === 'data:,') {
+            throw new Error('empty data url');
+          }
+          const binary = atob(dataUrl.split(',')[1]);
+          const len = binary.length;
+          const buffer = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            buffer[i] = binary.charCodeAt(i);
+          }
+          saveBlob(new Blob([buffer], { type: 'image/png' }));
+        } catch (err) {
+          finalize('PNG oluşturulamadı, lütfen tekrar deneyin.');
+        }
       }
-    }, 'image/png');
-  });
+    });
+  }
 
   drawCover();
 })();
