@@ -6,7 +6,6 @@ require_once __DIR__ . '/../src/csrf.php';
 require_login();
 $user = current_user();
 
-// Get user's books
 $st = db()->prepare("SELECT * FROM books WHERE user_id = ? AND is_deleted = 0 ORDER BY created_at DESC");
 $st->execute([$user['id']]);
 $books = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -19,264 +18,533 @@ $books = $st->fetchAll(PDO::FETCH_ASSOC);
   <title>Kitaplarım - <?= e(APP_NAME) ?></title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <style>
-  /* === DUAL THEME - Pembe & Siyah === */
-  
-  /* PEMBE TEMA (Default) */
-  body {
-    background: linear-gradient(135deg, #fef5ff 0%, #fff0f9 25%, #f8f0ff 50%, #fff5fb 75%, #fef5ff 100%);
-    color:#5a3d5c;
-    transition: all 0.5s ease;
+  body.books-page {
+    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    min-height: 100vh;
+    padding: 36px 20px 48px;
+    background: radial-gradient(circle at 12% 20%, #fff4fb 0%, #ffe6f5 35%, #f7ecff 65%, #f5f7ff 100%);
+    color: #412a4f;
+    transition: background 0.45s ease, color 0.45s ease;
+    position: relative;
+    overflow-x: hidden;
   }
-  
-  body::before {
+
+  body.books-page::before,
+  body.books-page::after {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(221, 160, 221, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.1) 0%, transparent 50%);
-    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.55;
     z-index: 0;
-    transition: all 0.5s ease;
+    transition: opacity 0.5s ease, transform 0.6s ease;
   }
-  
-  /* SİYAH TEMA */
-  body.dark-theme {
-    background: #0e0b1a;
-    color:#f5e8ff;
+
+  body.books-page::before {
+    width: 420px;
+    height: 420px;
+    top: -120px;
+    left: -80px;
+    background: linear-gradient(135deg, rgba(255, 183, 224, 0.8), rgba(245, 207, 255, 0.65));
   }
-  
-  body.dark-theme::before {
-    opacity: 0;
+
+  body.books-page::after {
+    width: 360px;
+    height: 360px;
+    bottom: -140px;
+    right: -80px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.6), rgba(255, 107, 157, 0.6));
   }
-  
-  .container {
+
+  body.books-page.dark-theme {
+    background: radial-gradient(circle at 20% 20%, #140d24 0%, #0c0717 45%, #06030f 100%);
+    color: #ede2ff;
+  }
+
+  body.books-page.dark-theme::before,
+  body.books-page.dark-theme::after {
+    opacity: 0.25;
+    transform: scale(1.08);
+  }
+
+  .books-page .container {
+    max-width: 1200px;
+    margin: 0 auto;
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
   }
-  
-  /* KARTLAR */
-  body.dark-theme .card {
-    border:1px solid #2a2144;
-    background: rgba(255,255,255,.04);
-    box-shadow: 
-      0 4px 16px rgba(0, 0, 0, 0.3),
-      inset 0 0 20px rgba(124, 58, 237, 0.05);
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 26px;
+    box-shadow: 0 18px 48px rgba(198, 135, 255, 0.2);
+    backdrop-filter: blur(24px);
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
   }
-  
-  body.dark-theme .card:hover {
-    box-shadow: 
-      0 8px 24px rgba(124, 58, 237, 0.25),
-      inset 0 0 30px rgba(124, 58, 237, 0.1);
-    border-color: #3a2a54;
+
+  .glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 26px 64px rgba(198, 107, 231, 0.28);
   }
-  
-  /* BUTONLAR */
-  body.dark-theme .btn {
-    border:1px solid #2a2144;
-    background: #161226;
-    box-shadow: 
-      0 2px 8px rgba(0, 0, 0, 0.3),
-      inset 0 1px 1px rgba(124, 58, 237, 0.2);
+
+  body.books-page.dark-theme .glass-card {
+    background: rgba(17, 13, 30, 0.78);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    box-shadow: 0 20px 60px rgba(5, 2, 12, 0.6);
   }
-  
-  body.dark-theme .btn:hover {
-    box-shadow: 
-      0 4px 12px rgba(124, 58, 237, 0.4),
-      inset 0 1px 1px rgba(124, 58, 237, 0.3);
-    border-color: #3a2a54;
+
+  .top-shell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
   }
-  
-  /* SMALL TEXT */
-  body.dark-theme .small {
-    color: #d4b5d7;
+
+  .brand-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
-  
-  /* H3 */
-  body.dark-theme h3 {
-    color: #ffd2f0;
+
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: inherit;
+    text-decoration: none;
   }
-  
-  /* LINKS */
-  body.dark-theme a {
-    color: #f5b6e8;
+
+  .brand-icon {
+    font-size: 1.8rem;
   }
-  
-  body.dark-theme a:hover {
-    color: #ff69b4;
-  }
-  
-  /* BADGE */
-  body.dark-theme .badge {
-    background: rgba(124, 58, 237, 0.2);
-    color: #ffd2f0;
-  }
-  
-  /* BRAND */
-  body.dark-theme .brand {
-    background: linear-gradient(135deg, #ff69b4, #ba55d3);
+
+  .brand-link span.brand {
+    background: linear-gradient(135deg, #ff7ac2, #c36ce8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
-  /* === THEME TOGGLE BUTTON === */
-  .theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    background: linear-gradient(135deg, #dda0dd 0%, #d8a0d8 100%);
-    border: 1px solid rgba(255, 182, 193, 0.5);
-    border-radius: 50px;
-    padding: 12px 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(221, 160, 221, 0.3);
-    transition: all 0.3s ease;
+
+  .brand-tagline {
+    font-size: 0.92rem;
+    opacity: 0.75;
+    max-width: 420px;
+    line-height: 1.5;
+  }
+
+  .header-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px 10px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.6);
+    color: #4f2f66;
     font-weight: 600;
-    color: white;
-    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 10px 28px rgba(255, 153, 211, 0.25);
+    transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   }
-  
-  body.dark-theme .theme-toggle {
-    background: #161226;
-    border: 1px solid #2a2144;
-    box-shadow: 
-      0 4px 15px rgba(0, 0, 0, 0.4),
-      inset 0 0 20px rgba(124, 58, 237, 0.15);
-  }
-  
+
   .theme-toggle:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(221, 160, 221, 0.5);
+    box-shadow: 0 16px 36px rgba(198, 107, 231, 0.32);
   }
-  
-  body.dark-theme .theme-toggle:hover {
-    box-shadow: 
-      0 6px 20px rgba(124, 58, 237, 0.4),
-      inset 0 0 30px rgba(124, 58, 237, 0.25);
-    border-color: #3a2a54;
+
+  .toggle-track {
+    position: relative;
+    width: 54px;
+    height: 28px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255, 119, 188, 0.55), rgba(198, 107, 231, 0.55));
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 3px;
   }
-  
-  .theme-toggle-icon {
-    font-size: 20px;
+
+  .toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    color: #ff6bb7;
+    font-size: 15px;
+    display: grid;
+    place-items: center;
+    transition: transform 0.4s ease, color 0.4s ease, background 0.4s ease;
   }
-  
-  /* Responsive */
+
+  .theme-labels {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .theme-name {
+    font-size: 0.9rem;
+  }
+
+  .theme-sub {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
+  }
+
+  body.books-page.dark-theme .theme-toggle {
+    background: rgba(23, 18, 39, 0.75);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    color: #f4ddff;
+    box-shadow: 0 14px 34px rgba(5, 2, 12, 0.6);
+  }
+
+  body.books-page.dark-theme .toggle-track {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.6), rgba(18, 10, 56, 0.6));
+    border: 1px solid rgba(124, 58, 237, 0.4);
+  }
+
+  body.books-page.dark-theme .toggle-thumb {
+    transform: translateX(24px) rotate(360deg);
+    background: #21163a;
+    color: #ffd6ff;
+  }
+
+  .user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    font-weight: 600;
+  }
+
+  body.books-page.dark-theme .user-chip {
+    background: rgba(23, 18, 39, 0.7);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    color: #f4e1ff;
+  }
+
+  .ghost-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 47, 100, 0.2);
+    background: transparent;
+    color: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+
+  .ghost-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .books-overview {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ff7fc8, #c66ce8);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 16px 34px rgba(198, 106, 232, 0.35);
+    transition: transform 0.25s ease, box-shadow 0.3s ease;
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 48px rgba(198, 106, 232, 0.45);
+  }
+
+  body.books-page.dark-theme .cta-btn {
+    background: linear-gradient(135deg, #7c3aed, #ff6fb5);
+  }
+
+  .stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-weight: 600;
+    margin-top: 16px;
+  }
+
+  body.books-page.dark-theme .stat-pill {
+    background: rgba(23, 18, 39, 0.65);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+  }
+
+  .book-gallery {
+    displayenche truncated...
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  .book-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(250, 220, 255, 0.55);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px rgba(198, 107, 231, 0.22);
+  }
+
+  body.books-page.dark-theme .book-card {
+    background: rgba(17, 13, 30, 0.75);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    box-shadow: inset 0 0 0 1px rgba(12, 8, 24, 0.72);
+  }
+
+  .book-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .book-meta {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .book-cover {
+    max-width: 160px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
+  }
+
+  .book-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .book-actions .btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, rgba(255, 134, 199, 0.85), rgba(198, 107, 231, 0.85));
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .book-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 24px rgba(198, 107, 231, 0.35);
+  }
+
+  body.books-page.dark-theme .book-actions .btn {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.8), rgba(255, 111, 181, 0.8));
+  }
+
+  .empty-state {
+    display: grid;
+    gap: 14px;
+    text-align: center;
+    padding: 40px 20px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+
+  body.books-page.dark-theme .empty-state {
+    background: rgba(17, 13, 30, 0.7);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 1024px) {
+    .books-overview {
+      grid-template-columns: 1fr;
+    }
+  }
+
   @media (max-width: 768px) {
+    body.books-page {
+      padding: 24px 16px 36px;
+    }
+
+    .glass-card {
+      padding: 22px;
+    }
+
+    .header-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+
     .theme-toggle {
-      top: 10px;
-      right: 10px;
-      padding: 10px 18px;
-      font-size: 12px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .user-chip, .nav-links {
+      width: 100%;
+      justify-content: center;
     }
   }
   </style>
 </head>
-<body>
-
-<!-- Theme Toggle Button -->
-<button class="theme-toggle" id="theme-toggle">
-  <span class="theme-toggle-icon" id="theme-icon">🌸</span>
-  <span id="theme-text">Pembe</span>
-</button>
-
-<script>
-// === THEME SWITCHER ===
-function toggleTheme() {
-  const body = document.body;
-  const icon = document.getElementById('theme-icon');
-  const text = document.getElementById('theme-text');
-  
-  body.classList.toggle('dark-theme');
-  
-  if (body.classList.contains('dark-theme')) {
-    icon.textContent = '🌙';
-    text.textContent = 'Siyah';
-    localStorage.setItem('books-theme', 'dark');
-  } else {
-    icon.textContent = '🌸';
-    text.textContent = 'Pembe';
-    localStorage.setItem('books-theme', 'light');
-  }
-}
-
-// Load saved theme
-(function() {
-  const savedTheme = localStorage.getItem('books-theme');
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-    document.getElementById('theme-icon').textContent = '🌙';
-    document.getElementById('theme-text').textContent = 'Siyah';
-  }
-})();
-
-// Attach event
-document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-</script>
-
-  <div class="container">
-    <div class="card header">
-      <div>
-        <a class="btn" href="<?= base_url('index.php') ?>" style="text-decoration:none;">
-          🌸 <span class="brand"><?= e(APP_NAME) ?></span>
-        </a>
-      </div>
-      <div>
-        <span class="badge">Merhaba, <?= e($user['username']) ?></span>
-        · <a href="<?= base_url('dashboard.php') ?>">Panel</a>
-        · <a href="<?= base_url('books.php') ?>">Kitaplarım</a>
-        · <a href="<?= base_url('notes.php') ?>">Notlarım</a>
-        · <a href="<?= base_url('eglence.php') ?>">Eğlence</a>
-        · <a href="<?= base_url('designer_cover.php') ?>">Kapak</a>
-        · <a href="<?= base_url('designer_map.php') ?>">Harita</a>
-        · <a href="<?= base_url('logout.php') ?>">Çıkış</a>
+<body class="books-page">
+<div class="container">
+  <div class="glass-card top-shell">
+    <div class="brand-block">
+      <a class="brand-link" href="<?= base_url('index.php') ?>">
+        <span class="brand-icon">🌸</span>
+        <span class="brand"><?= e(APP_NAME) ?></span>
+      </a>
+      <p class="brand-tagline">Kitaplarını pembe raflarda sergile, siyah moda geçerek gece düzenlemeleri yap.</p>
+      <a class="ghost-btn" href="<?= base_url('dashboard.php') ?>">← Panele dön</a>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
+        <span class="toggle-track">
+          <span class="toggle-thumb" id="theme-thumb">🌸</span>
+        </span>
+        <span class="theme-labels">
+          <span class="theme-name" id="theme-label">Pembe</span>
+          <span class="theme-sub">Tema</span>
+        </span>
+      </button>
+      <span class="user-chip">📚 <?= e($user['username']) ?></span>
+      <div class="nav-links">
+        <a class="ghost-btn" href="<?= base_url('notes.php') ?>">📝 Notlar</a>
+        <a class="ghost-btn" href="<?= base_url('designer_cover.php') ?>">🎨 Kapak Tasarım</a>
+        <a class="ghost-btn" href="<?= base_url('designer_map.php') ?>">🗺️ Harita Tasarım</a>
+        <a class="ghost-btn" href="<?= base_url('logout.php') ?>">Çıkış</a>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <h2>📚 Kitaplarım</h2>
-      <a href="<?= base_url('book_new.php') ?>" class="btn">+ Yeni Kitap Oluştur</a>
-      
-      <div style="margin-top: 30px;">
-        <?php if (empty($books)): ?>
-          <p>Henüz kitabınız yok. Hemen bir tane oluşturun!</p>
-        <?php else: ?>
+  <div class="books-overview">
+    <div class="glass-card">
+      <h2>📚 Kitap Rafın</h2>
+      <p>Kitaplarını düzenle, kapaklarını geliştir ve 3D görüntüleyiciyle dene. Tema düğmesi her rafta çalışır.</p>
+      <a class="cta-btn" href="<?= base_url('book_new.php') ?>">➕ Yeni Kitap Oluştur</a>
+      <div class="stat-pill">✨ Toplam <?= number_format(count($books), 0, ',', '.') ?> kitap</div>
+    </div>
+
+    <div class="glass-card">
+      <h2>🔥 Son Eklenenler</h2>
+      <?php if (empty($books)): ?>
+        <div class="empty-state">
+          <div style="font-size:42px;">📭</div>
+          <p>Henüz kitap eklenmemiş. İlk kitabını oluşturarak Craftrolle raflarını doldurabilirsin.</p>
+          <a class="cta-btn" href="<?= base_url('book_new.php') ?>">📕 İlk Kitabımı Oluştur</a>
+        </div>
+      <?php else: ?>
+        <div class="book-gallery">
           <?php foreach ($books as $book): ?>
-            <div class="card" style="margin: 15px 0;">
+            <div class="book-card">
               <h3><?= e($book['title']) ?></h3>
-              <div class="small">
-                Oluşturulma: <?= date('d.m.Y H:i', strtotime($book['created_at'])) ?>
-                · Görünürlük: <?= e($book['visibility']) ?>
+              <div class="book-meta">
+                <span>📆 <?= e(date('d.m.Y H:i', strtotime($book['created_at']))) ?></span>
+                <span>🔒 <?= e(ucfirst($book['visibility'])) ?></span>
               </div>
               <?php if ($book['cover_path']): ?>
-                <img src="<?= base_url('../' . ltrim($book['cover_path'], '/')) ?>" 
-                     style="max-width:150px; border-radius:8px; margin:10px 0;">
+                <img class="book-cover" src="<?= base_url('../' . ltrim($book['cover_path'], '/')) ?>" alt="Kitap kapağı">
               <?php endif; ?>
-              <div style="margin-top: 10px;">
-                <a href="<?= base_url('view_book.php?id=' . $book['id']) ?>" class="btn">
-                  📖 3D Görüntüle
-                </a>
-                <a href="<?= base_url('book_edit.php?id=' . $book['id']) ?>" class="btn">
-                  ✏️ Düzenle
-                </a>
+              <div class="book-actions">
+                <a class="btn" href="<?= base_url('book_view.php?id=' . (int)$book['id']) ?>">📖 3D Görüntüle</a>
+                <a class="btn" href="<?= base_url('book_edit.php?id=' . (int)$book['id']) ?>">✏️ Düzenle</a>
               </div>
             </div>
           <?php endforeach; ?>
-        <?php endif; ?>
-      </div>
-    </div>
-
-    <div class="small" style="text-align:center; margin-top:12px;">
-      © <?= date('Y') ?> <?= e(APP_NAME) ?>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
+
+  <div class="footer-note">© <?= date('Y') ?> <?= e(APP_NAME) ?> · Craftrolle kitap rafı</div>
+</div>
+
+<script>
+(function() {
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeThumb = document.getElementById('theme-thumb');
+  const themeLabel = document.getElementById('theme-label');
+  const storageKey = 'craft-books-theme';
+
+  if (!themeToggle) { return; }
+
+  const applyTheme = (mode) => {
+    const isDark = mode === 'dark';
+    document.body.classList.toggle('dark-theme', isDark);
+    themeThumb.textContent = isDark ? '🌙' : '🌸';
+    themeLabel.textContent = isDark ? 'Siyah' : 'Pembe';
+    themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    localStorage.setItem(storageKey, mode);
+  };
+
+  const stored = localStorage.getItem(storageKey);
+  applyTheme(stored === 'dark' ? 'dark' : 'light');
+
+  themeToggle.addEventListener('click', () => {
+    const nextMode = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+    applyTheme(nextMode);
+  });
+})();
+</script>
 </body>
 </html>
