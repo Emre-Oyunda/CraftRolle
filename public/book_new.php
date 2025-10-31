@@ -457,11 +457,22 @@ body.book-new.dark-theme .creator-footer button {
   font-size: 0.92rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(198, 107, 231, 0.18);
+  color: #3f2851;
 }
 
 .bottom-nav a:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(198, 107, 231, 0.25);
+}
+
+body.book-new.dark-theme .bottom-nav a {
+  background: rgba(23, 18, 39, 0.65);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #f4ddff;
+}
+
+body.book-new.dark-theme .bottom-nav a:hover {
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
 }
 
 .footer-note {

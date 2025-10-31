@@ -457,11 +457,22 @@ body.book-view.dark-theme .page-indicator {
   font-size: 0.92rem;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   box-shadow: 0 4px 14px rgba(198, 107, 231, 0.18);
+  color: #3f2951;
 }
 
 .bottom-nav a:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(198, 107, 231, 0.26);
+}
+
+body.book-view.dark-theme .bottom-nav a {
+  background: rgba(23, 18, 39, 0.7);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #f4ddff;
+}
+
+body.book-view.dark-theme .bottom-nav a:hover {
+  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.35);
 }
 
 .footer-note {
