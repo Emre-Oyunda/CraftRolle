@@ -6,165 +6,341 @@ require_once __DIR__ . '/../src/csrf.php';
 $user = current_user();
 ?>
 <!doctype html>
-<html lang="tr"><head>
+<html lang="tr">
+<head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Yeni Kitap - <?= e(APP_NAME) ?></title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
-/* === DUAL THEME - Pembe & Siyah === */
-
-/* PEMBE TEMA (Default) */
-body {
-  background: linear-gradient(135deg, #fef5ff 0%, #fff0f9 25%, #f8f0ff 50%, #fff5fb 75%, #fef5ff 100%);
-  color:#5a3d5c;
-  transition: all 0.5s ease;
+body.book-new {
+  font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+  min-height: 100vh;
+  padding: 36px 20px 48px;
+  background: radial-gradient(circle at 12% 18%, #fff3fb 0%, #ffe6f4 35%, #f6eaff 70%, #f3f5ff 100%);
+  color: #3f2851;
+  transition: background 0.45s ease, color 0.45s ease;
+  position: relative;
+  overflow-x: hidden;
 }
 
-body::before {
+body.book-new::before,
+body.book-new::after {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(221, 160, 221, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(255, 192, 203, 0.1) 0%, transparent 50%);
-  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.55;
   z-index: 0;
-  transition: all 0.5s ease;
+  transition: opacity 0.5s ease, transform 0.6s ease;
 }
 
-/* SİYAH TEMA */
-body.dark-theme {
-  background: #0e0b1a;
-  color:#f5e8ff;
+body.book-new::before {
+  width: 420px;
+  height: 420px;
+  top: -120px;
+  left: -80px;
+  background: linear-gradient(135deg, rgba(255, 183, 224, 0.9), rgba(245, 207, 255, 0.7));
 }
 
-body.dark-theme::before {
-  opacity: 0;
+body.book-new::after {
+  width: 360px;
+  height: 360px;
+  bottom: -140px;
+  right: -80px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.6), rgba(255, 107, 157, 0.6));
 }
 
-.container {
+body.book-new.dark-theme {
+  background: radial-gradient(circle at 20% 20%, #150e24 0%, #0c0717 45%, #06030f 100%);
+  color: #efe3ff;
+}
+
+body.book-new.dark-theme::before,
+body.book-new.dark-theme::after {
+  opacity: 0.25;
+  transform: scale(1.08);
+}
+
+.book-new .container {
+  max-width: 1100px;
+  margin: 0 auto;
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-/* KARTLAR */
-body.dark-theme .card {
-  border:1px solid #2a2144;
-  background: rgba(255,255,255,.04);
-  box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.3),
-    inset 0 0 20px rgba(124, 58, 237, 0.05);
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 26px;
+  box-shadow: 0 18px 48px rgba(198, 135, 255, 0.2);
+  backdrop-filter: blur(24px);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
-body.dark-theme .card:hover {
-  box-shadow: 
-    0 8px 24px rgba(124, 58, 237, 0.25),
-    inset 0 0 30px rgba(124, 58, 237, 0.1);
-  border-color: #3a2a54;
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 64px rgba(198, 107, 231, 0.28);
 }
 
-/* BUTONLAR */
-body.dark-theme .btn,
-body.dark-theme button {
-  border:1px solid #2a2144;
-  background: #161226;
-  color: #ffd2f0;
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 1px rgba(124, 58, 237, 0.2);
+body.book-new.dark-theme .glass-card {
+  background: rgba(18, 14, 34, 0.78);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  box-shadow: 0 20px 60px rgba(6, 2, 12, 0.6);
 }
 
-body.dark-theme .btn:hover,
-body.dark-theme button:hover {
-  box-shadow: 
-    0 4px 12px rgba(124, 58, 237, 0.4),
-    inset 0 1px 1px rgba(124, 58, 237, 0.3);
-  border-color: #3a2a54;
+.top-shell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
-/* INPUT & TEXTAREA */
-body.dark-theme input,
-body.dark-theme textarea,
-body.dark-theme select {
-  background: rgba(22, 18, 38, 0.6);
-  border: 1px solid #2a2144;
-  color: #f5e8ff;
+.brand-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-body.dark-theme input:focus,
-body.dark-theme textarea:focus,
-body.dark-theme select:focus {
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: none;
 }
 
-body.dark-theme input::placeholder,
-body.dark-theme textarea::placeholder {
-  color: rgba(245, 232, 255, 0.4);
+.brand-icon {
+  font-size: 1.8rem;
 }
 
-/* SMALL TEXT */
-body.dark-theme .small {
-  color: #d4b5d7;
-}
-
-/* LABELS */
-body.dark-theme label {
-  color: #f5b6e8;
-}
-
-/* LINKS */
-body.dark-theme a {
-  color: #f5b6e8;
-}
-
-body.dark-theme a:hover {
-  color: #ff69b4;
-}
-
-/* BADGE */
-body.dark-theme .badge {
-  background: rgba(124, 58, 237, 0.2);
-  color: #ffd2f0;
-}
-
-/* BRAND */
-body.dark-theme .brand {
-  background: linear-gradient(135deg, #ff69b4, #ba55d3);
+.brand-link span.brand {
+  background: linear-gradient(135deg, #ff7ac0, #c46de8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* === WRITER ENHANCEMENTS === */
-
-.writer-zone {
-  margin: 20px 0;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(221, 160, 221, 0.3);
-  transition: all 0.3s ease;
+.brand-tagline {
+  font-size: 0.92rem;
+  opacity: 0.75;
+  max-width: 440px;
+  line-height: 1.5;
 }
 
-body.dark-theme .writer-zone {
-  background: rgba(22, 18, 38, 0.5);
-  border: 1px solid #2a2144;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
-.writer-zone:focus-within {
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.6);
+  color: #4f2f66;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(255, 153, 211, 0.25);
+  transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.theme-toggle:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(221, 160, 221, 0.3);
+  box-shadow: 0 16px 36px rgba(198, 107, 231, 0.32);
 }
 
-body.dark-theme .writer-zone:focus-within {
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
-  border-color: #3a2a54;
+.toggle-track {
+  position: relative;
+  width: 54px;
+  height: 28px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 119, 188, 0.55), rgba(198, 107, 231, 0.55));
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 3px;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  color: #ff6bb7;
+  font-size: 15px;
+  display: grid;
+  place-items: center;
+  transition: transform 0.4s ease, color 0.4s ease, background 0.4s ease;
+}
+
+.theme-labels {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.theme-name {
+  font-size: 0.9rem;
+}
+
+.theme-sub {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+}
+
+body.book-new.dark-theme .theme-toggle {
+  background: rgba(23, 18, 39, 0.75);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  color: #f4ddff;
+  box-shadow: 0 14px 34px rgba(5, 2, 12, 0.6);
+}
+
+body.book-new.dark-theme .toggle-track {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.6), rgba(18, 10, 56, 0.6));
+  border: 1px solid rgba(124, 58, 237, 0.4);
+}
+
+body.book-new.dark-theme .toggle-thumb {
+  transform: translateX(24px) rotate(360deg);
+  background: #21163a;
+  color: #ffd6ff;
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  font-weight: 600;
+}
+
+body.book-new.dark-theme .user-chip {
+  background: rgba(23, 18, 39, 0.7);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #f4e1ff;
+}
+
+.ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(79, 47, 100, 0.2);
+  background: transparent;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.ghost-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.nav-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.creator-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+}
+
+body.book-new.dark-theme .writer-zone {
+  background: rgba(18, 14, 34, 0.8);
+  border: 1px solid rgba(124, 58, 237, 0.32);
+}
+
+.weapon-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.weapon-panel label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.weapon-panel input,
+.weapon-panel textarea,
+.weapon-panel select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(125, 73, 148, 0.22);
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.78);
+  color: inherit;
+  font-size: 1rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.weapon-panel input:focus,
+.weapon-panel textarea:focus,
+.weapon-panel select:focus,
+.writer-zone textarea:focus {
+  outline: none;
+  border-color: rgba(198, 107, 231, 0.6);
+  box-shadow: 0 0 0 4px rgba(198, 107, 231, 0.18);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+body.book-new.dark-theme .weapon-panel input,
+body.book-new.dark-theme .weapon-panel textarea,
+body.book-new.dark-theme .weapon-panel select {
+  background: rgba(18, 14, 36, 0.85);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.toolbar .btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, rgba(255, 134, 199, 0.85), rgba(198, 107, 231, 0.85));
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toolbar .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(198, 107, 231, 0.35);
+}
+
+body.book-new.dark-theme .toolbar .btn {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.8), rgba(255, 111, 181, 0.8));
 }
 
 .writing-textarea {
@@ -172,20 +348,17 @@ body.dark-theme .writer-zone:focus-within {
   font-size: 16px;
   line-height: 1.8;
   padding: 16px;
-  min-height: 400px;
+  min-height: 420px;
   resize: vertical;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(125, 73, 148, 0.22);
+  color: inherit;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
-.writing-textarea:focus {
-  outline: none;
-  border-color: #dda0dd;
-  box-shadow: 0 0 0 4px rgba(221, 160, 221, 0.15);
-}
-
-body.dark-theme .writing-textarea:focus {
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15);
+body.book-new.dark-theme .writing-textarea {
+  background: rgba(18, 14, 36, 0.85);
+  border: 1px solid rgba(124, 58, 237, 0.32);
 }
 
 .stats-bar {
@@ -198,36 +371,9 @@ body.dark-theme .writing-textarea:focus {
   color: #8b6b8d;
 }
 
-body.dark-theme .stats-bar {
+body.book-new.dark-theme .stats-bar {
   border-top: 1px solid rgba(124, 58, 237, 0.2);
   color: #d4b5d7;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.stat-icon {
-  font-size: 16px;
-}
-
-.inspiration-quote {
-  text-align: center;
-  font-style: italic;
-  color: #a97da9;
-  margin: 16px 0;
-  padding: 12px;
-  background: rgba(221, 160, 221, 0.1);
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-body.dark-theme .inspiration-quote {
-  color: #d4b5d7;
-  background: rgba(124, 58, 237, 0.1);
 }
 
 .save-indicator {
@@ -246,7 +392,7 @@ body.dark-theme .inspiration-quote {
   color: #d17a00;
 }
 
-body.dark-theme .save-indicator.unsaved {
+body.book-new.dark-theme .save-indicator.unsaved {
   background: rgba(255, 200, 124, 0.15);
   color: #ffb870;
 }
@@ -257,7 +403,7 @@ body.dark-theme .save-indicator.unsaved {
   animation: pulse-save 0.5s ease;
 }
 
-body.dark-theme .save-indicator.saved {
+body.book-new.dark-theme .save-indicator.saved {
   background: rgba(124, 221, 160, 0.15);
   color: #7ce8a0;
 }
@@ -267,223 +413,214 @@ body.dark-theme .save-indicator.saved {
   50% { transform: scale(1.05); }
 }
 
-.focus-mode-btn {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  z-index: 999;
-  background: linear-gradient(135deg, #dda0dd 0%, #d8a0d8 100%);
+.creator-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.creator-footer button {
+  padding: 12px 20px;
+  border-radius: 12px;
   border: none;
-  border-radius: 50%;
-  width: 56px;
-  height: 56px;
+  background: linear-gradient(135deg, #ff7fc7, #c56ae6);
+  color: #fff;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(221, 160, 221, 0.4);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
+  box-shadow: 0 16px 30px rgba(197, 106, 230, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
 }
 
-body.dark-theme .focus-mode-btn {
-  background: #161226;
-  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
-}
-
-.focus-mode-btn:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 20px rgba(221, 160, 221, 0.6);
-}
-
-body.dark-theme .focus-mode-btn:hover {
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
-}
-
-/* Focus Mode */
-body.focus-mode .card.header,
-body.focus-mode .bottom-nav,
-body.focus-mode .theme-toggle,
-body.focus-mode h2,
-body.focus-mode .grid,
-body.focus-mode .inspiration-quote,
-body.focus-mode .card > button {
-  opacity: 0.2;
-  pointer-events: none;
-  transition: opacity 0.5s ease;
-}
-
-body.focus-mode .writer-zone {
-  transform: scale(1.02);
-  box-shadow: 0 12px 40px rgba(221, 160, 221, 0.4);
-}
-
-body.focus-mode.dark-theme .writer-zone {
-  box-shadow: 0 12px 40px rgba(124, 58, 237, 0.4);
-}
-
-/* === THEME TOGGLE BUTTON === */
-.theme-toggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  background: linear-gradient(135deg, #dda0dd 0%, #d8a0d8 100%);
-  border: 1px solid rgba(255, 182, 193, 0.5);
-  border-radius: 50px;
-  padding: 12px 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(221, 160, 221, 0.3);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  color: white;
-  font-size: 14px;
-}
-
-body.dark-theme .theme-toggle {
-  background: #161226;
-  border: 1px solid #2a2144;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.4),
-    inset 0 0 20px rgba(124, 58, 237, 0.15);
-}
-
-.theme-toggle:hover {
+.creator-footer button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(221, 160, 221, 0.5);
+  box-shadow: 0 22px 42px rgba(197, 106, 230, 0.45);
 }
 
-body.dark-theme .theme-toggle:hover {
-  box-shadow: 
-    0 6px 20px rgba(124, 58, 237, 0.4),
-    inset 0 0 30px rgba(124, 58, 237, 0.25);
-  border-color: #3a2a54;
+body.book-new.dark-theme .creator-footer button {
+  background: linear-gradient(135deg, #7c3aed, #ff6fb5);
 }
 
-/* Responsive */
+.bottom-nav {
+  display: flex;
+  justify-content(cursor truncated
+  center;
+  gap: 20px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.bottom-nav a {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  font-size: 0.92rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(198, 107, 231, 0.18);
+}
+
+.bottom-nav a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(198, 107, 231, 0.25);
+}
+
+.footer-note {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 8px;
+}
+
+@media (max-width: 1024px) {
+  .creator-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
+  body.book-new {
+    padding: 24px 16px 36px;
+  }
+
+  .glass-card {
+    padding: 22px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .theme-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 10px 18px;
-    font-size: 12px;
+    width: 100%;
+    justify-content: center;
   }
-  
-  .focus-mode-btn {
-    bottom: 70px;
-    right: 10px;
-    width: 48px;
-    height: 48px;
-    font-size: 20px;
+
+  .user-chip, .nav-links {
+    width: 100%;
+    justify-content: center;
   }
-  
-  .stats-bar {
-    flex-wrap: wrap;
+
+  .creator-footer {
+    flex-direction: column;
     gap: 12px;
+    align-items: flex-start;
+  }
+
+  .creator-footer button {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>
-</head><body><div class="container">
+</head>
+<body class="book-new">
+<div class="container">
+  <div class="glass-card top-shell">
+    <div class="brand-block">
+      <a class="brand-link" href="<?= base_url('index.php') ?>">
+        <span class="brand-icon">🌸</span>
+        <span class="brand"><?= e(APP_NAME) ?></span>
+      </a>
+      <p class="brand-tagline">Yeni kitabını yazmaya pembe bir sayfadan başla; tek tuşla siyah moda geç.</p>
+      <a class="ghost-btn" href="<?= base_url('books.php') ?>">← Kitaplara dön</a>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
+        <span class="toggle-track">
+          <span class="toggle-thumb" id="theme-thumb">🌸</span>
+        </span>
+        <span class="theme-labels">
+          <span class="theme-name" id="theme-label">Pembe</span>
+          <span class="theme-sub">Tema</span>
+        </span>
+      </button>
+      <span class="user-chip">✍️ <?= e($user['username']) ?></span>
+      <div class="nav-links">
+        <a class="ghost-btn" href="<?= base_url('notes.php') ?>">📝 Notlar</a>
+        <a class="ghost-btn" href="<?= base_url('designer_cover.php') ?>">🎨 Kapak</a>
+        <a class="ghost-btn" href="<?= base_url('designer_map.php') ?>">🗺️ Harita</a>
+        <a class="ghost-btn" href="<?= base_url('logout.php') ?>">Çıkış</a>
+      </div>
+    </div>
+  </div>
 
-<!-- Theme Toggle Button -->
-<button class="theme-toggle" id="theme-toggle" type="button">
-  <span class="theme-toggle-icon" id="theme-icon">🌸</span>
-  <span id="theme-text">Pembe</span>
-</button>
-
-<!-- Focus Mode Button -->
-<button class="focus-mode-btn" id="focus-mode-btn" type="button" title="Odaklanma Modu">
-  👁️
-</button>
-
-  <div class="card header">
-    <div><a class="btn" href="<?= base_url('index.php') ?>" style="text-decoration:none;">🌸 <span class="brand"><?= e(APP_NAME) ?></span></a></div>
+  <div class="glass-card creator-grid">
     <div>
-      <?php if($user): ?>
-        <span class="badge">Merhaba, <?= e($user['username']) ?></span>
-        · <a href="<?= base_url('dashboard.php') ?>">Panel</a>
-        · <a href="<?= base_url('books.php') ?>">Kitaplarım</a>
-        · <a href="<?= base_url('notes.php') ?>">Notlarım</a>
-        · <a href="<?= base_url('eglence.php') ?>">Eğlence</a>
-        · <a href="<?= base_url('designer_cover.php') ?>">Kapak</a>
-        · <a href="<?= base_url('designer_map.php') ?>">Harita</a>
-        · <a href="<?= base_url('logout.php') ?>">Çıkış</a>
-      <?php else: ?>
-        <a href="<?= base_url('login.php') ?>">Giriş</a> · <a href="<?= base_url('register.php') ?>">Kayıt Ol</a>
-      <?php endif; ?>
-    </div>
-  </div>
+      <h2>✨ Yeni Kitap Oluştur</h2>
+      <p>Başlığı seç, görünürlüğü ayarla ve hikâyeni yazmaya başla. Taslaklar tarayıcında saklanır, kaybolmaz.</p>
+      <div class="weapon-panel">
+        <form id="book-form" method="post" action="book_save.php">
+          <?php csrf_field(); ?>
+          <input type="hidden" name="book_id" value="">
 
-<?php require_login(); csrf_check(); ?>
-<div class="card">
-  <h2>✍️ Yeni Kitap Oluştur</h2>
-  
-  <div class="inspiration-quote" id="inspiration-quote">
-    "Bir kitap yazmak, içindeki dünyayı kâğıda dökmektir."
+          <label for="title-input">📖 Kitap Başlığı</label>
+          <input name="title" id="title-input" required placeholder="Büyük macera burada başlar...">
+
+          <label for="visibility">🔒 Görünürlük</label>
+          <select name="visibility" id="visibility">
+            <option value="private">Gizli (Sadece Ben)</option>
+            <option value="unlisted">Liste Dışı (Link ile)</option>
+            <option value="public">Herkese Açık</option>
+          </select>
+
+          <label for="description">📝 Kısa Açıklama</label>
+          <textarea name="description" id="description" rows="2" placeholder="Okuyucular kitap kartında bu satırı görür"></textarea>
+
+          <div class="creator-footer">
+            <div class="save-indicator unsaved" id="save-badge">
+              <span>💾</span>
+              <span>Henüz kaydedilmedi</span>
+            </div>
+            <button type="submit">💾 Kaydet ve Devam Et</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div>
+      <h2>🖋️ Hikâyeni Yaz</h2>
+      <p style="font-size:0.88rem; opacity:0.75; margin-bottom:14px;">Kalemin ısınıyor. Tema düğmesi ile gece yazımlarında gözlerini dinlendir.</p>
+      <div class="toolbar">
+        <button type="button" data-cmd="bold" class="btn">B</button>
+        <button type="button" data-cmd="italic" class="btn"><i>İ</i></button>
+        <button type="button" data-cmd="underline" class="btn"><u>A</u></button>
+        <button type="button" data-cmd="h1" class="btn">Başlık</button>
+        <button type="button" data-cmd="ul" class="btn">Liste</button>
+      </div>
+      <div class="writer-zone">
+        <textarea 
+          name="content" 
+          id="content-textarea" 
+          form="book-form"
+          class="writing-textarea" 
+          placeholder="Bir zamanlar, uzak bir diyarda...&#10;&#10;Her büyük hikâye tek bir kelimeyle başlar. Şimdi sıra sende."></textarea>
+
+        <div class="stats-bar">
+          <div class="stat-item">
+            <span class="stat-icon">📊</span>
+            <span><strong id="char-count">0</strong> karakter</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">📚</span>
+            <span><strong id="word-count">0</strong> kelime</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">📄</span>
+            <span><strong id="page-count">0</strong> sayfa (yaklaşık)</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">⏱️</span>
+            <span><strong id="read-time">0</strong> dk okuma</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="inspiration-quote" id="inspiration-quote">
+        "Bir kitap yazmak, içindeki dünyayı kâğıda dökmektir."
+      </div>
+    </div>
   </div>
-  
-  <form id="book-form" method="post" action="book_save.php">
-    <?php csrf_field(); ?>
-    <input type="hidden" name="book_id" value="">
-    
-    <div class="grid g-2">
-      <div>
-        <label>📖 Kitap Başlığı</label>
-        <input name="title" id="title-input" required placeholder="Büyük bir hikâyenin başlığı...">
-      </div>
-      <div>
-        <label>🔒 Görünürlük</label>
-        <select name="visibility">
-          <option value="private">Gizli (Sadece Ben)</option>
-          <option value="unlisted">Liste Dışı (Link ile)</option>
-          <option value="public">Herkese Açık</option>
-        </select>
-      </div>
-    </div>
-    
-    <label>📝 Kısa Açıklama</label>
-    <textarea name="description" rows="2" placeholder="Kitabınızın özeti (arama ve kapak için)"></textarea>
-    
-    <label>✨ Kitabınızı Yazın</label>
-    <div class="writer-zone">
-      <textarea 
-        name="content" 
-        id="content-textarea" 
-        class="writing-textarea" 
-        placeholder="Bir zamanlar, uzak bir diyarda...&#10;&#10;Her büyük hikâye tek bir kelimeyle başlar. Şimdi sizin sıranız."></textarea>
-      
-      <div class="stats-bar">
-        <div class="stat-item">
-          <span class="stat-icon">📊</span>
-          <span><strong id="char-count">0</strong> karakter</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">📚</span>
-          <span><strong id="word-count">0</strong> kelime</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">📄</span>
-          <span><strong id="page-count">0</strong> sayfa (yaklaşık)</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">⏱️</span>
-          <span><strong id="read-time">0</strong> dk okuma</span>
-        </div>
-      </div>
-    </div>
-    
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
-      <div class="save-indicator unsaved" id="save-badge">
-        <span>💾</span>
-        <span>Henüz kaydedilmedi</span>
-      </div>
-      <button type="submit">💾 Kaydet ve Devam Et</button>
-    </div>
-  </form>
-</div>
 
   <div class="bottom-nav">
     <a href="<?= base_url('books.php') ?>">📚 Kitaplar</a>
@@ -491,131 +628,107 @@ body.dark-theme .theme-toggle:hover {
     <a href="<?= base_url('designer_cover.php') ?>">🎨 Kapak</a>
     <a href="<?= base_url('designer_map.php') ?>">🗺️ Harita</a>
   </div>
-  <div class="small" style="text-align:center;margin-top:12px;">© <?= date('Y') ?> <?= e(APP_NAME) ?> </div>
+  <div class="footer-note">© <?= date('Y') ?> <?= e(APP_NAME) ?> · Craftrolle kitap stüdyosu</div>
 </div>
 
 <script src="../assets/js/editor.js"></script>
 <script>
-// === THEME SWITCHER ===
-function toggleTheme() {
-  const body = document.body;
-  const icon = document.getElementById('theme-icon');
-  const text = document.getElementById('theme-text');
-  
-  body.classList.toggle('dark-theme');
-  
-  if (body.classList.contains('dark-theme')) {
-    icon.textContent = '🌙';
-    text.textContent = 'Siyah';
-    localStorage.setItem('book-new-theme', 'dark');
-  } else {
-    icon.textContent = '🌸';
-    text.textContent = 'Pembe';
-    localStorage.setItem('book-new-theme', 'light');
-  }
-}
-
-// Load saved theme
 (function() {
-  const savedTheme = localStorage.getItem('book-new-theme');
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-    document.getElementById('theme-icon').textContent = '🌙';
-    document.getElementById('theme-text').textContent = 'Siyah';
-  }
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeThumb = document.getElementById('theme-thumb');
+  const themeLabel = document.getElementById('theme-label');
+  const storageKey = 'craft-book-new-theme';
+
+  if (!themeToggle) { return; }
+
+  const applyTheme = (mode) => {
+    const isDark = mode === 'dark';
+    document.body.classList.toggle('dark-theme', isDark);
+    themeThumb.textContent = isDark ? '🌙' : '🌸';
+    themeLabel.textContent = isDark ? 'Siyah' : 'Pembe';
+    themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    localStorage.setItem(storageKey, mode);
+  };
+
+  const stored = localStorage.getItem(storageKey);
+  applyTheme(stored === 'dark' ? 'dark' : 'light');
+
+  themeToggle.addEventListener('click', () => {
+    const nextMode = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+    applyTheme(nextMode);
+  });
 })();
 
-document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+(function() {
+  const focusBtn = document.getElementById('focus-mode-btn');
+  focusBtn.addEventListener('click', function() {
+    document.body.classList.toggle('focus-mode');
+    if (document.body.classList.contains('focus-mode')) {
+      focusBtn.textContent = '✖️';
+      focusBtn.title = 'Normal Moda Dön';
+    } else {
+      focusBtn.textContent = '👁️';
+      focusBtn.title = 'Odaklanma Modu';
+    }
+  });
+})();
 
-// === FOCUS MODE ===
-document.getElementById('focus-mode-btn').addEventListener('click', function() {
-  document.body.classList.toggle('focus-mode');
-  const icon = this;
-  if (document.body.classList.contains('focus-mode')) {
-    icon.textContent = '✖️';
-    icon.title = 'Normal Moda Dön';
-  } else {
-    icon.textContent = '👁️';
-    icon.title = 'Odaklanma Modu';
-  }
-});
+(function() {
+  const textarea = document.getElementById('content-textarea');
+  const charCount = document.getElementById('char-count');
+  const wordCount = document.getElementById('word-count');
+  const pageCount = document.getElementById('page-count');
+  const readTime = document.getElementById('read-time');
+  const saveBadge = document.getElementById('save-badge');
+  const quotes = [
+    '"Bir kitap yazmak, içindeki dünyayı kâğıda dökmektir."',
+    '"Her cümle, yeni bir olasılığın kapısını aralar."',
+    '"Yazmak, düşüncelere şekil vermektir."',
+    '"Kelimeler, hayallerin mimarlığıdır."',
+    '"Her yazar, kendi evreninin yaratıcısıdır."',
+    '"Yazı, ruhun aynasıdır."',
+    '"Hikâyeler, zamanın ötesine uzanır."',
+    '"Yazmak cesarettir, paylaşmak ise özgürlük."',
+    '"Her sayfa, yeni bir maceranın başlangıcıdır."',
+    '"Kalem, hayal gücünün değneğidir."'
+  ];
 
-// === WRITING STATS ===
-const contentTextarea = document.getElementById('content-textarea');
-const charCount = document.getElementById('char-count');
-const wordCount = document.getElementById('word-count');
-const pageCount = document.getElementById('page-count');
-const readTime = document.getElementById('read-time');
-
-function updateStats() {
-  const text = contentTextarea.value;
-  const chars = text.length;
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  const pages = Math.ceil(words / 250); // 250 kelime/sayfa
-  const minutes = Math.ceil(words / 200); // 200 kelime/dakika okuma hızı
-  
-  charCount.textContent = chars.toLocaleString('tr-TR');
-  wordCount.textContent = words.toLocaleString('tr-TR');
-  pageCount.textContent = pages.toLocaleString('tr-TR');
-  readTime.textContent = minutes.toLocaleString('tr-TR');
-}
-
-contentTextarea.addEventListener('input', updateStats);
-updateStats();
-
-// === INSPIRATION QUOTES ===
-const quotes = [
-  '"Bir kitap yazmak, içindeki dünyayı kâğıda dökmektir."',
-  '"Her cümle, yeni bir olasılığın kapısını aralar."',
-  '"Yazmak, düşüncelere şekil vermektir."',
-  '"Kelimeler, hayallerin mimarlığıdır."',
-  '"Her yazar, kendi evreninin yaratıcısıdır."',
-  '"Yazı, ruhun aynasıdır."',
-  '"Hikâyeler, zamanın ötesine uzanır."',
-  '"Yazmak cesarettir, paylaşmak ise özgürlük."',
-  '"Her sayfa, yeni bir maceranın başlangıcıdır."',
-  '"Kalem, hayal gücünün değneğidir."'
-];
-
-function changeQuote() {
   const quoteEl = document.getElementById('inspiration-quote');
-  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-  quoteEl.style.opacity = '0';
-  setTimeout(() => {
-    quoteEl.textContent = randomQuote;
-    quoteEl.style.opacity = '1';
-  }, 300);
-}
-
-// Change quote every 30 seconds
-setInterval(changeQuote, 30000);
-
-// === AUTO-SAVE INDICATOR (Simulated) ===
-let saveTimeout;
-const saveBadge = document.getElementById('save-badge');
-
-contentTextarea.addEventListener('input', function() {
-  saveBadge.className = 'save-indicator unsaved';
-  saveBadge.innerHTML = '<span>⏳</span><span>Yazılıyor...</span>';
-  
-  clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    // Simulate auto-save (gerçek implementasyonda AJAX ile kayıt yapılabilir)
-    saveBadge.className = 'save-indicator saved';
-    saveBadge.innerHTML = '<span>✅</span><span>Otomatik kaydedildi</span>';
-    
+  setInterval(() => {
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    quoteEl.style.opacity = '0';
     setTimeout(() => {
-      saveBadge.className = 'save-indicator unsaved';
-      saveBadge.innerHTML = '<span>💾</span><span>Değişiklikler kaydedildi</span>';
-    }, 2000);
-  }, 3000);
-});
+      quoteEl.textContent = randomQuote;
+      quoteEl.style.opacity = '1';
+    }, 300);
+  }, 30000);
 
-// === FORM SUBMIT ===
-document.getElementById('book-form').addEventListener('submit', function() {
-  saveBadge.className = 'save-indicator saved';
-  saveBadge.innerHTML = '<span>✅</span><span>Kaydediliyor...</span>';
-});
+  const updateStats = () => {
+    const text = textarea.value;
+    const chars = text.length;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const pages = Math.ceil(words / 250);
+    const minutes = Math.ceil(words / 200);
+
+    charCount.textContent = chars.toLocaleString('tr-TR');
+    wordCount.textContent = words.toLocaleString('tr-TR');
+    pageCount.textContent = pages.toLocaleString('tr-TR');
+    readTime.textContent = minutes.toLocaleString('tr-TR');
+  };
+
+  textarea.addEventListener('input', () => {
+    updateStats();
+    saveBadge.className = 'save-indicator unsaved';
+    saveBadge.innerHTML = '<span>⏳</span><span>Yazılıyor...</span>';
+  });
+
+  updateStats();
+
+  document.getElementById('book-form').addEventListener('submit', () => {
+    saveBadge.className = 'save-indicator saved';
+    saveBadge.innerHTML = '<span>✅</span><span>Kaydediliyor...</span>';
+  });
+})();
 </script>
-
-</body></html>
+</body>
+</html>
