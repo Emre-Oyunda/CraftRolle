@@ -443,7 +443,7 @@ body.cover-designer.dark-theme .bottom-nav a:hover {
         <span class="brand-icon">🌸</span>
         <span class="brand"><?= e(APP_NAME) ?></span>
       </a>
-      <p class="brand-tagline">3 şablon, sınırsız renk—Craftrolle kapak stüdyosuna hoş geldin.</p>
+      <p class="brand-tagline">Romance'dan noir'a, 6 farklı şablonla Craftrolle kapak stüdyosuna hoş geldin.</p>
       <a class="ghost-btn" href="<?= base_url('books.php') ?>">← Kitaplara dön</a>
     </div>
     <div class="header-actions">
@@ -476,8 +476,12 @@ body.cover-designer.dark-theme .bottom-nav a:hover {
         <label for="template">Şablon</label>
         <select id="template">
           <option value="romance">Romance (Pembe)</option>
-          <option value="scifi">Sci‑Fi</option>
+          <option value="scifi">Sci‑Fi (Neon)</option>
           <option value="minimal">Minimal</option>
+          <option value="fantasy">Fantasy (Büyülü)</option>
+          <option value="noir">Noir (Siyah-Beyaz)</option>
+          <option value="nature">Nature (Doğa)</option>
+          <option value="retro">Retro Pop</option>
         </select>
 
         <label for="title-input">Başlık</label>
@@ -491,7 +495,8 @@ body.cover-designer.dark-theme .bottom-nav a:hover {
 
         <div class="template-preview">
           <strong>🎯 İpucu</strong>
-          <p>Başlık & yazar alanlarını doldur, uygun şablonu seç ve PNG olarak dışa aktararak kitap kartında kullan.</p>
+          <p>Şablonu değiştirerek farklı ruh halleri yakalayın: romance pembe, noir gri tonlar, nature yeşil dokular sunar.</p>
+          <p>Başlık ve yazar alanlarını doldurduktan sonra "PNG Kaydet" ile dışa aktarın; çıktıyı kitap kartında kullanabilirsiniz.</p>
         </div>
       </div>
     </div>
