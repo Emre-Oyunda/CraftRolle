@@ -390,6 +390,40 @@ $noteCount = count($rows);
     margin-bottom: 12px;
   }
 
+  .note-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+
+  .note-search input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: inherit;
+  }
+
+  .note-search input:focus {
+    outline: none;
+  }
+
+  body.notes-page.dark-theme .note-search {
+    background: rgba(18, 14, 36, 0.72);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+  }
+
+  .results-meta {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    margin-bottom: 12px;
+  }
+
   .note-gallery {
     display: grid;
     gap: 16px;
@@ -463,6 +497,21 @@ $noteCount = count($rows);
 
   body.notes-page.dark-theme .note-card .note-tag {
     background: rgba(23, 18, 39, 0.65);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+  }
+
+  .no-results {
+    display: none;
+    padding: 24px 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  body.notes-page.dark-theme .no-results {
+    background: rgba(18, 14, 36, 0.72);
     border: 1px solid rgba(124, 58, 237, 0.3);
   }
 
@@ -622,7 +671,14 @@ $noteCount = count($rows);
           <a class="cta-btn" href="<?= base_url('notes.php') ?>">📝 İlk Notumu Yaz</a>
         </div>
       <?php else: ?>
-        <div class="note-gallery">
+        <div class="note-search">
+          <span aria-hidden="true">🔍</span>
+          <input id="note-search" type="search" placeholder="Başlıkta ara...">
+        </div>
+        <div class="results-meta">
+          <span id="results-total">Toplam <?= number_format($noteCount, 0, ',', '.') ?> not</span>
+        </div>
+        <div class="note-gallery" id="note-gallery">
           <?php foreach ($rows as $note): ?>
             <?php
               $updated = strtotime($note['updated_at'] ?? '');
@@ -631,7 +687,7 @@ $noteCount = count($rows);
                 $excerpt = mb_substr($excerpt, 0, 117) . '…';
               }
             ?>
-            <a class="note-card" href="<?= base_url('note_view.php?id=' . (int) $note['id']) ?>">
+            <a class="note-card" href="<?= base_url('note_view.php?id=' . (int) $note['id']) ?>" data-title="<?= e($note['title']) ?>" data-body="<?= e($excerpt) ?>">
               <div class="note-date">⏱️ <?= $updated ? e(date('d.m.Y H:i', $updated)) : '—' ?></div>
               <h3><?= e($note['title']) ?></h3>
               <?php if ($excerpt): ?>
@@ -641,6 +697,7 @@ $noteCount = count($rows);
             </a>
           <?php endforeach; ?>
         </div>
+        <div class="no-results" id="no-results">Aramanıza uygun not bulunamadı.</div>
       <?php endif; ?>
     </div>
   </div>
@@ -673,6 +730,45 @@ $noteCount = count($rows);
     const nextMode = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
     applyTheme(nextMode);
   });
+})();
+
+(function() {
+  const searchInput = document.getElementById('note-search');
+  const gallery = document.getElementById('note-gallery');
+  const totalLabel = document.getElementById('results-total');
+  const noResults = document.getElementById('no-results');
+  if (!searchInput || !gallery) { return; }
+
+  const cards = Array.from(gallery.querySelectorAll('.note-card'));
+  const totalCount = cards.length;
+
+  const updateTotals = (visible) => {
+    if (totalLabel) {
+      totalLabel.textContent = `${visible} / ${totalCount} not`;
+    }
+    if (noResults) {
+      noResults.style.display = visible === 0 ? 'block' : 'none';
+    }
+  };
+
+  const filterNotes = (term) => {
+    const normalized = term.trim().toLowerCase();
+    let visible = 0;
+    cards.forEach(card => {
+      const title = (card.dataset.title || '').toLowerCase();
+      const body = (card.dataset.body || '').toLowerCase();
+      const match = !normalized || title.includes(normalized) || body.includes(normalized);
+      card.style.display = match ? 'flex' : 'none';
+      if (match) { visible += 1; }
+    });
+    updateTotals(visible);
+  };
+
+  searchInput.addEventListener('input', (event) => {
+    filterNotes(event.target.value);
+  });
+
+  filterNotes('');
 })();
 </script>
 </body>
