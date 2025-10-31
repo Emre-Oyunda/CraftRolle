@@ -299,8 +299,8 @@ body.book-view.dark-theme .user-chip {
 
 .book-3d {
   position: relative;
-  width: 800px;
-  height: 500px;
+  width: min(90vw, 800px);
+  height: calc(min(90vw, 800px) * 0.62);
   transform-style: preserve-3d;
   transition: transform 0.4s ease;
 }
@@ -319,12 +319,12 @@ body.book-view.dark-theme .user-chip {
 
 .book-page {
   position: absolute;
-  width: 380px;
-  height: 500px;
+  width: calc(min(90vw, 800px) / 2 - 20px);
+  height: calc(min(90vw, 800px) * 0.62);
   background: linear-gradient(to right, #fefefe 0%, #f8f8f8 50%, #fefefe 100%);
   border: 1px solid #e3dce6;
   border-radius: 0 12px 12px 0;
-  padding: 40px 30px;
+  padding: clamp(18px, 3vw, 40px) clamp(16px, 3vw, 30px);
   box-shadow: 0 18px 40px rgba(0,0,0,0.18), inset -2px 0 12px rgba(0,0,0,0.05);
   transform-style: preserve-3d;
   transform-origin: left center;
@@ -333,7 +333,7 @@ body.book-view.dark-theme .user-chip {
 }
 
 .book-page.left-page {
-  left: 10px;
+  left: clamp(6px, 1.5vw, 14px);
   transform-origin: right center;
   border-radius: 12px 0 0 12px;
   background: linear-gradient(to left, #fefefe 0%, #f8f8f8 50%, #fefefe 100%);
@@ -341,7 +341,7 @@ body.book-view.dark-theme .user-chip {
 }
 
 .book-page.right-page {
-  right: 10px;
+  right: clamp(6px, 1.5vw, 14px);
   transform-origin: left center;
 }
 
@@ -365,8 +365,8 @@ body.book-view.dark-theme .user-chip {
 .page-content {
   position: relative;
   height: 100%;
-  font-size: 15px;
-  line-height: 1.8;
+  font-size: clamp(13px, 2.1vw, 15px);
+  line-height: 1.75;
   color: #2d2437;
   text-align: justify;
   white-space: pre-wrap;
@@ -489,14 +489,14 @@ body.book-view.dark-theme .bottom-nav a:hover {
   }
 
   .book-3d {
-    width: 640px;
-    height: 420px;
+    width: min(90vw, 640px);
+    height: calc(min(90vw, 640px) * 0.65);
   }
 
   .book-page {
-    width: 310px;
-    height: 420px;
-    padding: 32px 24px;
+    width: calc(min(90vw, 640px) / 2 - 18px);
+    height: calc(min(90vw, 640px) * 0.65);
+    padding: clamp(16px, 3.2vw, 32px) clamp(14px, 3vw, 24px);
   }
 }
 
@@ -525,14 +525,14 @@ body.book-view.dark-theme .bottom-nav a:hover {
   }
 
   .book-3d {
-    width: 420px;
-    height: 320px;
+    width: min(92vw, 440px);
+    height: calc(min(92vw, 440px) * 0.66);
   }
 
   .book-page {
-    width: 200px;
-    height: 320px;
-    padding: 24px 18px;
+    width: calc(min(92vw, 440px) / 2 - 14px);
+    height: calc(min(92vw, 440px) * 0.66);
+    padding: clamp(14px, 4vw, 24px) clamp(12px, 3.5vw, 18px);
   }
 }
 </style>
