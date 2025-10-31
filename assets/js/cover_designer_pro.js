@@ -236,14 +236,28 @@
   authorInput.addEventListener('input', updateCover);
 
   downloadBtn.addEventListener('click', () => {
-    const dataUrl = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.download = (titleInput.value || 'craftrolle_kapak') + '.png';
-    link.href = dataUrl;
-    link.click();
-    if (resultEl) {
-      resultEl.textContent = 'PNG olarak indirildi.';
-    }
+    downloadBtn.disabled = true;
+    downloadBtn.textContent = '⌛ Hazırlanıyor...';
+    canvas.toBlob((blob) => {
+      downloadBtn.disabled = false;
+      downloadBtn.textContent = 'PNG Kaydet/Yükle';
+      if (!blob) {
+        if (resultEl) { resultEl.textContent = 'PNG oluşturulamadı, lütfen tekrar deneyin.'; }
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = (titleInput.value || 'craftrolle_kapak') + '.png';
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      if (resultEl) {
+        const now = new Date();
+        resultEl.textContent = 'PNG indirildi (' + now.toLocaleTimeString('tr-TR') + ')';
+      }
+    }, 'image/png');
   });
 
   drawCover();
