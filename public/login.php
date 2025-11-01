@@ -127,9 +127,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($identifierValue !== '' && $password !== '') {
         try {
-            $stmt = db()->prepare('SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1');
-            $stmt->execute([$identifierValue, $identifierValue]);
+            $pdo = db();
+
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ? LIMIT 1');
+            $stmt->execute([$identifierValue]);
             $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$userRow && filter_var($identifierValue, FILTER_VALIDATE_EMAIL)) {
+                $stmt = $pdo->prepare('SELECT * FROM users WHERE email = ? LIMIT 1');
+                $stmt->execute([$identifierValue]);
+                $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
         } catch (Throwable $th) {
             $userRow = false;
             $error = 'Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
