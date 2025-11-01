@@ -1,163 +1,36 @@
 <?php
-declare(strict_types=1);
-
 require_once __DIR__ . '/../src/config.php';
 require_once __DIR__ . '/../src/helpers.php';
-require_once __DIR__ . '/../src/auth.php';
-if (file_exists(__DIR__ . '/../src/csrf.php')) {
-    require_once __DIR__ . '/../src/csrf.php';
-}
-
-if (!function_exists('csrf_boot')) {
-    function csrf_boot(): void
-    {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            @session_start();
-        }
-    }
-}
-
-if (!function_exists('csrf_check')) {
-    function csrf_check(): void
-    {
-        if (function_exists('verify_csrf')) {
-            verify_csrf();
-        }
-    }
-}
-
-if (!function_exists('csrf_field')) {
-    function csrf_field(): string
-    {
-        $token = function_exists('csrf_token') ? csrf_token() : bin2hex(random_bytes(32));
-        return '<input type="hidden" name="csrf_token" value="' . e($token) . '">';
-    }
-}
-
-if (!function_exists('base_url_local')) {
-    function base_url_local(string $path = ''): string
-    {
-        return function_exists('base_url') ? base_url($path) : '/' . ltrim($path, '/');
-    }
-}
-
-if (!function_exists('track_user_session_login')) {
-    function track_user_session_login(int $user_id): void
-    {
-        if ($user_id <= 0) {
-            return;
-        }
-
-        try {
-            $pdo = db();
-            $pdo->exec(
-                "CREATE TABLE IF NOT EXISTS user_sessions (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT NOT NULL,
-                    ip VARCHAR(45) NOT NULL,
-                    user_agent VARCHAR(400) NOT NULL,
-                    first_seen DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    last_seen DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    login_count INT NOT NULL DEFAULT 1,
-                    lat DECIMAL(11,8) NULL,
-                    lng DECIMAL(11,8) NULL,
-                    geo_source VARCHAR(50) NULL,
-                    geo_at DATETIME NULL,
-                    UNIQUE KEY uniq_user_session (user_id, ip, user_agent),
-                    KEY idx_user (user_id)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
-            );
-
-            $ipHeader = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
-            if (strpos($ipHeader, ',') !== false) {
-                $ipHeader = explode(',', $ipHeader)[0];
-            }
-            $ip = trim($ipHeader) ?: '0.0.0.0';
-            $ua = substr((string)($_SERVER['HTTP_USER_AGENT'] ?? 'web'), 0, 400);
-
-            $stmt = $pdo->prepare(
-                "INSERT INTO user_sessions (user_id, ip, user_agent, first_seen, last_seen, login_count)
-                 VALUES (?, ?, ?, NOW(), NOW(), 1)
-                 ON DUPLICATE KEY UPDATE last_seen = NOW(), login_count = login_count + 1"
-            );
-            $stmt->execute([$user_id, $ip, $ua]);
-        } catch (Throwable $th) {
-            // sessiz devam
-        }
-    }
-}
-
-function sanitize_next(string $value): string
-{
-    $value = trim($value);
-
-    if ($value === '' || str_contains($value, '://') || str_starts_with($value, '//')) {
-        return '';
-    }
-
-    return $value;
-}
-
-csrf_boot();
-
-$currentUser = current_user();
-$safeNext = sanitize_next((string)($_GET['next'] ?? ''));
-
-if ($currentUser) {
-    $target = $safeNext !== '' ? $safeNext : 'dashboard.php';
-    header('Location: ' . base_url_local($target));
-    exit;
-}
+require_once __DIR__ . '/../src/csrf.php';
 
 $error = '';
-$identifierValue = '';
+$usernameValue = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (function_exists('csrf_check')) {
-        csrf_check();
-    }
+    verify_csrf();
 
-    $identifierValue = trim((string)($_POST['identifier'] ?? $_POST['username'] ?? ''));
+    $usernameValue = trim((string)($_POST['username'] ?? ''));
     $password = (string)($_POST['password'] ?? '');
-    $postNext = sanitize_next((string)($_POST['next'] ?? ''));
 
-    if ($postNext !== '') {
-        $safeNext = $postNext;
-    }
+    if ($usernameValue !== '' && $password !== '') {
+        $st = db()->prepare('SELECT * FROM users WHERE username = ? LIMIT 1');
+        $st->execute([$usernameValue]);
+        $user = $st->fetch(PDO::FETCH_ASSOC);
 
-    if ($identifierValue !== '' && $password !== '') {
-        try {
-            $pdo = db();
-
-            $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ? LIMIT 1');
-            $stmt->execute([$identifierValue]);
-            $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$userRow && filter_var($identifierValue, FILTER_VALIDATE_EMAIL)) {
-                $stmt = $pdo->prepare('SELECT * FROM users WHERE email = ? LIMIT 1');
-                $stmt->execute([$identifierValue]);
-                $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
-            }
-        } catch (Throwable $th) {
-            $userRow = false;
-            $error = 'Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
-        }
-
-        if (!$error && $userRow && password_verify($password, $userRow['password'] ?? '')) {
-            $_SESSION['user_id'] = (int)$userRow['id'];
-            track_user_session_login((int)$userRow['id']);
-
-            $target = $safeNext !== '' ? $safeNext : 'dashboard.php';
-            header('Location: ' . base_url_local($target));
-            exit;
-        }
-
-        if (!$error) {
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            redirect(base_url('dashboard.php'));
+        } else {
             $error = 'Giriş bilgileri hatalı.';
         }
     } else {
-        $error = 'Lütfen e-posta veya kullanıcı adı ile şifre girin.';
+        $error = 'Lütfen kullanıcı adı ve şifre girin.';
     }
+}
+
+function base_url_local(string $path = ''): string
+{
+    return base_url($path);
 }
 ?>
 <!doctype html>
@@ -679,16 +552,11 @@ body.auth-page.dark-theme .page-footer {
         <div class="alert"><?= e($error) ?></div>
       <?php endif; ?>
       <form class="auth-form" method="post" action="" novalidate>
-        <?php if (function_exists('csrf_field')): ?>
-          <?= csrf_field() ?>
-        <?php endif; ?>
-        <?php if ($safeNext !== ''): ?>
-          <input type="hidden" name="next" value="<?= e($safeNext) ?>">
-        <?php endif; ?>
+        <?= csrf_field() ?>
 
         <label class="field">
-          <span class="field-label">E-posta veya kullanıcı adı</span>
-          <input class="field-input" type="text" name="identifier" value="<?= e($identifierValue) ?>" autocomplete="username" required>
+          <span class="field-label">Kullanıcı adı</span>
+          <input class="field-input" type="text" name="username" value="<?= e($usernameValue) ?>" autocomplete="username" required>
         </label>
 
         <label class="field">
