@@ -15,8 +15,14 @@ $notesCount = db()->query("SELECT COUNT(*) FROM notes WHERE user_id = " . (int)$
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Panel - <?= e(APP_NAME) ?></title>
-<link rel="stylesheet" href="../assets/css/style.css">
 <style>
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Inter','Segoe UI',Tahoma,sans-serif;}
+a{text-decoration:none;color:inherit;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:linear-gradient(120deg,#7c5bff,#f58acb);color:#fff;font-weight:700;border:none;box-shadow:0 14px 32px rgba(124,90,220,0.22);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 20px 40px rgba(124,90,220,0.28);}
+.card{background:rgba(255,255,255,0.9);border-radius:20px;border:1px solid rgba(255,255,255,0.7);box-shadow:0 20px 46px rgba(120,90,210,0.14);backdrop-filter:blur(18px);}
+body.dashboard-legacy.dark-mode .card{background:rgba(28,24,50,0.9);border-color:rgba(108,92,190,0.36);box-shadow:0 24px 52px rgba(8,6,18,0.68);}
 body.dashboard-legacy {
   margin: 0;
   min-height: 100vh;
@@ -341,44 +347,44 @@ body.dashboard-legacy.dark-mode .dashboard-footer {
 <div class="dashboard-shell">
   <div class="card header">
     <div class="left-stack">
-      <a class="btn" href="<?= base_url('index.php') ?>" style="text-decoration:none;">🌸 <span class="brand"><?= e(APP_NAME) ?></span></a>
-      <button class="theme-toggle" id="dashboard-theme" type="button" aria-pressed="false"><span id="dash-theme-icon">🌸</span><span id="dash-theme-text">Pembe</span></button>
+      <a class="btn" href="<?= base_url('index.php') ?>" style="text-decoration:none;">?? <span class="brand"><?= e(APP_NAME) ?></span></a>
+      <button class="theme-toggle" id="dashboard-theme" type="button" aria-pressed="false"><span id="dash-theme-icon">??</span><span id="dash-theme-text">Pembe</span></button>
     </div>
     <div class="nav-inline">
       <span class="badge">Merhaba, <?= e($user['username']) ?></span>
       <a href="<?= base_url('dashboard.php') ?>">Panel</a>
-      <a href="<?= base_url('books.php') ?>">Kitaplarım</a>
-      <a href="<?= base_url('notes.php') ?>">Notlarım</a>
-      <a href="<?= base_url('eglence.php') ?>">Eğlence</a>
+      <a href="<?= base_url('books.php') ?>">Kitaplar?m</a>
+      <a href="<?= base_url('notes.php') ?>">Notlar?m</a>
+      <a href="<?= base_url('eglence.php') ?>">E?lence</a>
       <a href="<?= base_url('designer_cover.php') ?>">Kapak</a>
       <a href="<?= base_url('../profil/profil_advanced.php') ?>">Profilim</a>
       <a href="<?= base_url('designer_map.php') ?>">Harita</a>
-      <a href="<?= base_url('logout.php') ?>">Çıkış</a>
+      <a href="<?= base_url('logout.php') ?>">??k??</a>
     </div>
   </div>
 
   <section class="primary-hero">
-    <h2>🏠 Hoş Geldin, <?= e($user['username']) ?>!</h2>
-    <p>KitapKurdu panelinden kitaplarını yönet, notlarını düzenle ve tasarım araçlarına saniyeler içinde ulaş. Aşağıdaki kısayollar seni bekliyor.</p>
+    <h2>?? Ho? Geldin, <?= e($user['username']) ?>!</h2>
+    <p>KitapKurdu panelinden kitaplar?n? y?net, notlar?n? d?zenle ve tasar?m ara?lar?na saniyeler i?inde ula?. A?a??daki k?sayollar seni bekliyor.</p>
     <div class="quick-stats">
       <div class="stat-card">
-        <div style="font-size:1.5rem;">📚</div>
+        <div style="font-size:1.5rem;">??</div>
         <strong><?= (int)$booksCount ?></strong>
-        <span>Kitap stüdyona göz at.</span>
-        <a class="pill-btn secondary" href="<?= base_url('books.php') ?>">Kitaplarımı Aç</a>
+        <span>Kitap st?dyona g?z at.</span>
+        <a class="pill-btn secondary" href="<?= base_url('books.php') ?>">Kitaplar?m? A?</a>
       </div>
       <div class="stat-card">
-        <div style="font-size:1.5rem;">📝</div>
+        <div style="font-size:1.5rem;">??</div>
         <strong><?= (int)$notesCount ?></strong>
         <span>Fikirlerini kaydetmeye devam et.</span>
-        <a class="pill-btn secondary" href="<?= base_url('notes.php') ?>">Notlarımı Aç</a>
+        <a class="pill-btn secondary" href="<?= base_url('notes.php') ?>">Notlar?m? A?</a>
       </div>
       <div class="stat-card">
-        <div style="font-size:1.5rem;">🎉</div>
-        <strong>Eğlence</strong>
-        <span>Kitap yazarken işini kolaylaştır!</span>
+        <div style="font-size:1.5rem;">??</div>
+        <strong>E?lence</strong>
+        <span>Kitap yazarken i?ini kolayla?t?r!</span>
         <div class="action-buttons" style="margin-top:6px;">
-          <a class="pill-btn secondary" href="<?= base_url('eglence.php') ?>">Eğlence</a>
+          <a class="pill-btn secondary" href="<?= base_url('eglence.php') ?>">E?lence</a>
         </div>
       </div>
     </div>
@@ -386,37 +392,37 @@ body.dashboard-legacy.dark-mode .dashboard-footer {
 
   <div class="grid g-3">
     <div class="card action-card">
-      <h3>📚 Kitaplarım</h3>
-      <p>Yeni bir kitap projesi başlat ya da mevcut çalışmalarını düzenlemeye devam et.</p>
+      <h3>?? Kitaplar?m</h3>
+      <p>Yeni bir kitap projesi ba?lat ya da mevcut ?al??malar?n? d?zenlemeye devam et.</p>
       <div class="action-buttons">
         <a class="pill-btn" href="<?= base_url('book_new.php') ?>">+ Yeni Kitap</a>
-        <a class="pill-btn secondary" href="<?= base_url('books.php') ?>">Tüm Kitaplarım</a>
+        <a class="pill-btn secondary" href="<?= base_url('books.php') ?>">T?m Kitaplar?m</a>
       </div>
     </div>
     <div class="card action-card">
-      <h3>📝 Notlarım</h3>
-      <p>Karakter fişleri, sahne planları ve fikirlerini tek noktada topla.</p>
+      <h3>?? Notlar?m</h3>
+      <p>Karakter fi?leri, sahne planlar? ve fikirlerini tek noktada topla.</p>
       <div class="action-buttons">
-        <a class="pill-btn" href="<?= base_url('notes.php') ?>">Notlarımı Aç</a>
+        <a class="pill-btn" href="<?= base_url('notes.php') ?>">Notlar?m? A?</a>
       </div>
     </div>
     <div class="card action-card">
-      <h3>🎨 Tasarım Stüdyosu</h3>
-      <p>Kapak ve harita araçlarıyla evrenine görsel kimlik kazandır.</p>
+      <h3>?? Tasar?m St?dyosu</h3>
+      <p>Kapak ve harita ara?lar?yla evrenine g?rsel kimlik kazand?r.</p>
       <div class="action-buttons">
         <a class="pill-btn secondary" href="<?= base_url('designer_cover.php') ?>">Kapak Tasarla</a>
-        <a class="pill-btn secondary" href="<?= base_url('designer_map.php') ?>">Harita Oluştur</a>
+        <a class="pill-btn secondary" href="<?= base_url('designer_map.php') ?>">Harita Olu?tur</a>
       </div>
     </div>
   </div>
 
   <div class="bottom-nav">
-    <a href="<?= base_url('books.php') ?>">📚 Kitaplar</a>
-    <a href="<?= base_url('notes.php') ?>">📝 Notlar</a>
-    <a href="<?= base_url('designer_cover.php') ?>">🎨 Kapak</a>
-    <a href="<?= base_url('designer_map.php') ?>">🗺️ Harita</a>
+    <a href="<?= base_url('books.php') ?>">?? Kitaplar</a>
+    <a href="<?= base_url('notes.php') ?>">?? Notlar</a>
+    <a href="<?= base_url('designer_cover.php') ?>">?? Kapak</a>
+    <a href="<?= base_url('designer_map.php') ?>">??? Harita</a>
   </div>
-  <div class="dashboard-footer">© <?= date('Y') ?> <?= e(APP_NAME) ?>🌸</div>
+  <div class="dashboard-footer">? <?= date('Y') ?> <?= e(APP_NAME) ?>??</div>
 </div>
 
 <script>
@@ -429,7 +435,7 @@ body.dashboard-legacy.dark-mode .dashboard-footer {
   function apply(mode){
     const isDark=mode==='dark';
     document.body.classList.toggle('dark-mode',isDark);
-    if(icon) icon.textContent=isDark?'🌙':'🌸';
+    if(icon) icon.textContent=isDark?'??':'??';
     if(text) text.textContent=isDark?'Siyah':'Pembe';
     btn.setAttribute('aria-pressed',isDark?'true':'false');
     try{localStorage.setItem(key,mode);}catch(e){}
