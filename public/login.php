@@ -1,36 +1,155 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../src/config.php';
 require_once __DIR__ . '/../src/helpers.php';
-require_once __DIR__ . '/../src/csrf.php';
+require_once __DIR__ . '/../src/auth.php';
+if (file_exists(__DIR__ . '/../src/csrf.php')) {
+    require_once __DIR__ . '/../src/csrf.php';
+}
 
-$error = '';
-$usernameValue = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    verify_csrf();
-
-    $usernameValue = trim((string)($_POST['username'] ?? ''));
-    $password = (string)($_POST['password'] ?? '');
-
-    if ($usernameValue !== '' && $password !== '') {
-        $st = db()->prepare('SELECT * FROM users WHERE username = ? LIMIT 1');
-        $st->execute([$usernameValue]);
-        $user = $st->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            redirect(base_url('dashboard.php'));
-        } else {
-            $error = 'Giriş bilgileri hatalı.';
+if (!function_exists('csrf_boot')) {
+    function csrf_boot(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            @session_start();
         }
-    } else {
-        $error = 'Lütfen kullanıcı adı ve şifre girin.';
     }
 }
 
-function base_url_local(string $path = ''): string
+if (!function_exists('csrf_check')) {
+    function csrf_check(): void
+    {
+        if (function_exists('verify_csrf')) {
+            verify_csrf();
+        }
+    }
+}
+
+if (!function_exists('csrf_field')) {
+    function csrf_field(): string
+    {
+        $token = function_exists('csrf_token') ? csrf_token() : bin2hex(random_bytes(32));
+        return '<input type="hidden" name="csrf_token" value="' . e($token) . '">';
+    }
+}
+
+if (!function_exists('base_url_local')) {
+    function base_url_local(string $path = ''): string
+    {
+        return function_exists('base_url') ? base_url($path) : '/' . ltrim($path, '/');
+    }
+}
+
+if (!function_exists('track_user_session_login')) {
+    function track_user_session_login(int $user_id): void
+    {
+        if ($user_id <= 0) {
+            return;
+        }
+
+        try {
+            $pdo = db();
+            $pdo->exec(
+                "CREATE TABLE IF NOT EXISTS user_sessions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    ip VARCHAR(45) NOT NULL,
+                    user_agent VARCHAR(400) NOT NULL,
+                    first_seen DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    last_seen DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    login_count INT NOT NULL DEFAULT 1,
+                    lat DECIMAL(11,8) NULL,
+                    lng DECIMAL(11,8) NULL,
+                    geo_source VARCHAR(50) NULL,
+                    geo_at DATETIME NULL,
+                    UNIQUE KEY uniq_user_session (user_id, ip, user_agent),
+                    KEY idx_user (user_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+            );
+
+            $ipHeader = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+            if (strpos($ipHeader, ',') !== false) {
+                $ipHeader = explode(',', $ipHeader)[0];
+            }
+            $ip = trim($ipHeader) ?: '0.0.0.0';
+            $ua = substr((string)($_SERVER['HTTP_USER_AGENT'] ?? 'web'), 0, 400);
+
+            $stmt = $pdo->prepare(
+                "INSERT INTO user_sessions (user_id, ip, user_agent, first_seen, last_seen, login_count)
+                 VALUES (?, ?, ?, NOW(), NOW(), 1)
+                 ON DUPLICATE KEY UPDATE last_seen = NOW(), login_count = login_count + 1"
+            );
+            $stmt->execute([$user_id, $ip, $ua]);
+        } catch (Throwable $th) {
+            // sessiz devam
+        }
+    }
+}
+
+function sanitize_next(string $value): string
 {
-    return base_url($path);
+    $value = trim($value);
+
+    if ($value === '' || str_contains($value, '://') || str_starts_with($value, '//')) {
+        return '';
+    }
+
+    return $value;
+}
+
+csrf_boot();
+
+$currentUser = current_user();
+$safeNext = sanitize_next((string)($_GET['next'] ?? ''));
+
+if ($currentUser) {
+    $target = $safeNext !== '' ? $safeNext : 'dashboard.php';
+    header('Location: ' . base_url_local($target));
+    exit;
+}
+
+$error = '';
+$identifierValue = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (function_exists('csrf_check')) {
+        csrf_check();
+    }
+
+    $identifierValue = trim((string)($_POST['identifier'] ?? $_POST['username'] ?? ''));
+    $password = (string)($_POST['password'] ?? '');
+    $postNext = sanitize_next((string)($_POST['next'] ?? ''));
+
+    if ($postNext !== '') {
+        $safeNext = $postNext;
+    }
+
+    if ($identifierValue !== '' && $password !== '') {
+        try {
+            $stmt = db()->prepare('SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1');
+            $stmt->execute([$identifierValue, $identifierValue]);
+            $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Throwable $th) {
+            $userRow = false;
+            $error = 'Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+        }
+
+        if (!$error && $userRow && password_verify($password, $userRow['password'] ?? '')) {
+            $_SESSION['user_id'] = (int)$userRow['id'];
+            track_user_session_login((int)$userRow['id']);
+
+            $target = $safeNext !== '' ? $safeNext : 'dashboard.php';
+            header('Location: ' . base_url_local($target));
+            exit;
+        }
+
+        if (!$error) {
+            $error = 'Giriş bilgileri hatalı.';
+        }
+    } else {
+        $error = 'Lütfen e-posta veya kullanıcı adı ile şifre girin.';
+    }
 }
 ?>
 <!doctype html>
@@ -56,6 +175,7 @@ function base_url_local(string $path = ''): string
   --text-muted: rgba(35, 28, 60, 0.7);
   --error-bg: rgba(255, 100, 140, 0.14);
   --error-border: rgba(255, 100, 140, 0.45);
+  --orb-size: 140px;
 }
 
 * {
@@ -73,7 +193,33 @@ body.auth-page {
     linear-gradient(140deg, #f5f1ff 0%, #efe7ff 45%, #ffe8f6 100%);
   padding: 70px 20px 90px;
   position: relative;
+  overflow-x: hidden;
   transition: background 0.4s ease, color 0.4s ease;
+}
+
+.orb {
+  position: fixed;
+  inset: auto;
+  width: var(--orb-size);
+  height: var(--orb-size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.9), rgba(119, 76, 196, 0.32));
+  filter: blur(0.6px);
+  opacity: 0.45;
+  pointer-events: none;
+  animation: drift 22s linear infinite;
+  z-index: 0;
+}
+
+.orb:nth-of-type(1) { top: 8%; left: 6%; animation-duration: 28s; }
+.orb:nth-of-type(2) { top: 65%; right: 14%; animation-duration: 33s; }
+.orb:nth-of-type(3) { bottom: 12%; left: 18%; animation-duration: 26s; }
+.orb:nth-of-type(4) { top: 38%; right: 42%; animation-duration: 31s; }
+
+@keyframes drift {
+  0%   { transform: translate3d(-18px, -24px, 0) scale(1); opacity: 0.32; }
+  50%  { transform: translate3d(24px, 30px, 0) scale(1.08); opacity: 0.58; }
+  100% { transform: translate3d(-18px, -24px, 0) scale(1); opacity: 0.32; }
 }
 
 body.auth-page::before,
@@ -132,6 +278,12 @@ body.auth-page.dark-theme::after {
   box-shadow: 0 28px 70px rgba(120, 90, 200, 0.16);
   backdrop-filter: blur(24px);
   transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
+}
+
+@supports not (backdrop-filter: blur(16px)) {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.9);
+  }
 }
 
 .glass-panel:hover {
@@ -260,7 +412,7 @@ body.auth-page.dark-theme .nav-pill {
 
 .hero-card p {
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--text-muted);
 }
 
@@ -280,6 +432,28 @@ body.auth-page.dark-theme .hero-card p {
 
 body.auth-page.dark-theme .hero-list {
   color: rgba(236, 224, 255, 0.78);
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-badges span {
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(35, 28, 60, 0.74);
+}
+
+body.auth-page.dark-theme .hero-badges span {
+  background: rgba(26, 23, 46, 0.9);
+  border-color: rgba(108, 90, 190, 0.34);
+  color: rgba(236, 224, 255, 0.72);
 }
 
 .hero-link {
@@ -336,6 +510,29 @@ body.auth-page.dark-theme .hint {
 .field {
   display: grid;
   gap: 8px;
+  position: relative;
+}
+
+.field[data-icon] {
+  padding-left: 0;
+}
+
+.field[data-icon] .field-input {
+  padding-left: 46px;
+}
+
+.field[data-icon]::before {
+  content: attr(data-icon);
+  position: absolute;
+  top: 39px;
+  left: 16px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  opacity: 0.72;
+  pointer-events: none;
 }
 
 .field-label {
@@ -346,6 +543,12 @@ body.auth-page.dark-theme .hint {
 
 body.auth-page.dark-theme .field-label {
   color: rgba(236, 224, 255, 0.78);
+}
+
+.field-control {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .field-input {
@@ -361,7 +564,7 @@ body.auth-page.dark-theme .field-label {
 
 .field-input:focus {
   border-color: rgba(124, 90, 220, 0.6);
-  box-shadow: 0 0 0 3px rgba(124, 90, 220, 0.25);
+  box-shadow: 0 0 0 3px rgba(124, 90, 220, 0.22);
   outline: none;
 }
 
@@ -369,6 +572,36 @@ body.auth-page.dark-theme .field-input {
   background: rgba(26, 23, 46, 0.88);
   border-color: rgba(108, 90, 190, 0.38);
   color: #f5ebff;
+}
+
+.field:focus-within .field-label {
+  color: var(--violet-500);
+}
+
+body.auth-page.dark-theme .field:focus-within .field-label {
+  color: #d7c6ff;
+}
+
+.reveal-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(124, 90, 220, 0.12);
+  color: inherit;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  width: 38px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.reveal-btn:hover {
+  background: rgba(124, 90, 220, 0.22);
 }
 
 .primary-btn {
@@ -479,6 +712,9 @@ body.auth-page.dark-theme .page-footer {
 }
 
 @media (max-width: 620px) {
+  body.auth-page {
+    padding: 52px 14px 88px;
+  }
   .glass-panel {
     padding: 22px 24px;
   }
@@ -500,6 +736,9 @@ body.auth-page.dark-theme .page-footer {
   .hero-list {
     justify-items: center;
   }
+  .hero-badges {
+    justify-content: center;
+  }
   .hero-link {
     justify-content: center;
   }
@@ -510,10 +749,17 @@ body.auth-page.dark-theme .page-footer {
   .quick-links a {
     justify-content: center;
   }
+  .field[data-icon]::before {
+    left: 12px;
+  }
 }
 </style>
 </head>
 <body class="auth-page">
+<div class="orb"></div>
+<div class="orb"></div>
+<div class="orb"></div>
+<div class="orb"></div>
 <div class="page-shell">
   <header class="top-bar glass-panel">
     <a class="brand-link" href="<?= base_url_local('index.php') ?>">
@@ -523,7 +769,7 @@ body.auth-page.dark-theme .page-footer {
     <div class="top-controls">
       <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
         <span class="theme-icon" id="theme-icon">🌸</span>
-        <span class="theme-text" id="theme-text">Gündüz</span>
+        <span class="theme-text" id="theme-text">Pembe</span>
       </button>
       <nav class="top-nav">
         <a class="nav-pill is-active" href="<?= base_url_local('login.php') ?>">Giriş</a>
@@ -535,13 +781,18 @@ body.auth-page.dark-theme .page-footer {
   <main class="auth-grid">
     <section class="hero-card glass-panel">
       <h1>Tekrar hoş geldin! 💫</h1>
-      <p>CraftRolle ile hikâyelerini 3D kitaplara dönüştür, kapak ve haritalarla evrenini tamamla. Topluluk desteğiyle üretkenliğini artır.</p>
+      <p>CraftRolle ile hikâyelerini 3D kitaplara dönüştür, kapaklarını tasarla ve topluluktan ilham al. Dilediğin cihazdan hız kesmeden devam edebilirsin.</p>
       <ul class="hero-list">
         <li>📚 Bölüm bazlı yazım stüdyosu</li>
         <li>🎨 Kapak & harita tasarım araçları</li>
         <li>📝 Not & karakter arşivi</li>
         <li>🤝 Topluluk paylaşımları ve beğeniler</li>
       </ul>
+      <div class="hero-badges">
+        <span>⚡️ Canlı otomatik kayıt</span>
+        <span>🔒 Güvenli oturum</span>
+        <span>🌙 Pembe / Gece temasına geç</span>
+      </div>
       <a class="hero-link" href="<?= base_url_local('register.php') ?>">Aramıza ilk kez mi katılıyorsun? Kaydol →</a>
     </section>
 
@@ -552,16 +803,24 @@ body.auth-page.dark-theme .page-footer {
         <div class="alert"><?= e($error) ?></div>
       <?php endif; ?>
       <form class="auth-form" method="post" action="" novalidate>
-        <?= csrf_field() ?>
+        <?php if (function_exists('csrf_field')): ?>
+          <?= csrf_field() ?>
+        <?php endif; ?>
+        <?php if ($safeNext !== ''): ?>
+          <input type="hidden" name="next" value="<?= e($safeNext) ?>">
+        <?php endif; ?>
 
-        <label class="field">
-          <span class="field-label">Kullanıcı adı</span>
-          <input class="field-input" type="text" name="username" value="<?= e($usernameValue) ?>" autocomplete="username" required>
+        <label class="field" data-icon="@">
+          <span class="field-label">E-posta veya kullanıcı adı</span>
+          <input class="field-input" type="text" name="identifier" value="<?= e($identifierValue) ?>" autocomplete="username" required>
         </label>
 
-        <label class="field">
+        <label class="field" data-icon="🔒">
           <span class="field-label">Şifre</span>
-          <input class="field-input" type="password" name="password" autocomplete="current-password" required>
+          <div class="field-control">
+            <input class="field-input" type="password" name="password" autocomplete="current-password" required>
+            <button class="reveal-btn" type="button" aria-label="Şifreyi göster">👁</button>
+          </div>
         </label>
 
         <button class="primary-btn" type="submit">Giriş Yap</button>
@@ -580,14 +839,12 @@ body.auth-page.dark-theme .page-footer {
     <a href="<?= base_url_local('designer_map.php') ?>">🗺️ Harita Editörü</a>
   </section>
 
-  <footer class="page-footer">© <?= date('Y') ?> <?= e(APP_NAME) ?> • Yazarların yaratıcı alanı</footer>
+  <footer class="page-footer">© <?= date('Y') ?> <?= e(APP_NAME) ?> • 🌸</footer>
 </div>
 
 <script>
 (function () {
   const toggleBtn = document.getElementById('theme-toggle');
-  if (!toggleBtn) return;
-
   const icon = document.getElementById('theme-icon');
   const text = document.getElementById('theme-text');
   const storageKey = 'craft-auth-theme';
@@ -596,8 +853,8 @@ body.auth-page.dark-theme .page-footer {
     const isDark = mode === 'dark';
     document.body.classList.toggle('dark-theme', isDark);
     if (icon) icon.textContent = isDark ? '🌙' : '🌸';
-    if (text) text.textContent = isDark ? 'Gece' : 'Gündüz';
-    toggleBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    if (text) text.textContent = isDark ? 'Gece' : 'Pembe';
+    toggleBtn?.setAttribute('aria-pressed', isDark ? 'true' : 'false');
     try {
       localStorage.setItem(storageKey, mode);
     } catch (err) {
@@ -618,10 +875,22 @@ body.auth-page.dark-theme .page-footer {
 
   apply(saved === 'dark' ? 'dark' : 'light');
 
-  toggleBtn.addEventListener('click', () => {
+  toggleBtn?.addEventListener('click', () => {
     const next = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
     apply(next);
   });
+
+  const revealBtn = document.querySelector('.reveal-btn');
+  if (revealBtn) {
+    revealBtn.addEventListener('click', () => {
+      const field = revealBtn.closest('.field-control')?.querySelector('input');
+      if (!field) return;
+      const isPassword = field.getAttribute('type') === 'password';
+      field.setAttribute('type', isPassword ? 'text' : 'password');
+      revealBtn.textContent = isPassword ? '🙈' : '👁';
+      revealBtn.setAttribute('aria-label', isPassword ? 'Şifreyi gizle' : 'Şifreyi göster');
+    });
+  }
 })();
 </script>
 </body>
