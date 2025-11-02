@@ -572,6 +572,7 @@ body.book-new.dark-theme .bottom-nav a {
 @media (max-width: 1024px) {
   .creator-grid {
     grid-template-columns: 1fr;
+    grid-auto-flow: row;
   }
 }
 
@@ -629,6 +630,15 @@ body.book-new.dark-theme .bottom-nav a {
 
   .nav-links .ghost-btn {
     justify-content: center;
+    width: 100%;
+  }
+
+  .creator-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .creator-grid > * {
     width: 100%;
   }
 
@@ -719,74 +729,74 @@ body.book-new.dark-theme .bottom-nav a {
   <div class="glass-card top-shell">
     <div class="brand-block">
       <a class="brand-link" href="<?= base_url('index.php') ?>">
-        <span class="brand-icon">🌸</span>
+        <span class="brand-icon">??</span>
         <span class="brand"><?= e(APP_NAME) ?></span>
       </a>
-      <p class="brand-tagline">Yeni kitabını yazmaya pembe bir sayfadan başla; tek tuşla siyah moda geç.</p>
-      <a class="ghost-btn" href="<?= base_url('books.php') ?>">← Kitaplara dön</a>
+      <p class="brand-tagline">Yeni kitab?n? yazmaya pembe bir sayfadan ba?la; tek tu?la siyah moda ge?.</p>
+      <a class="ghost-btn" href="<?= base_url('books.php') ?>">? Kitaplara d?n</a>
     </div>
     <div class="header-actions">
       <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
         <span class="toggle-track">
-          <span class="toggle-thumb" id="theme-thumb">🌸</span>
+          <span class="toggle-thumb" id="theme-thumb">??</span>
         </span>
         <span class="theme-labels">
           <span class="theme-name" id="theme-label">Pembe</span>
           <span class="theme-sub">Tema</span>
         </span>
       </button>
-      <span class="user-chip">✍️ <?= e($user['username']) ?></span>
+      <span class="user-chip">?? <?= e($user['username']) ?></span>
       <div class="nav-links">
-        <a class="ghost-btn" href="<?= base_url('dashboard.php') ?>">📊 Panel</a>
-        <a class="ghost-btn" href="<?= base_url('notes.php') ?>">📝 Notlar</a>
-        <a class="ghost-btn" href="<?= base_url('designer_cover.php') ?>">🎨 Kapak</a>
-        <a class="ghost-btn" href="<?= base_url('designer_map.php') ?>">🗺️ Harita</a>
-        <a class="ghost-btn" href="<?= base_url('logout.php') ?>">Çıkış</a>
+        <a class="ghost-btn" href="<?= base_url('dashboard.php') ?>">?? Panel</a>
+        <a class="ghost-btn" href="<?= base_url('notes.php') ?>">?? Notlar</a>
+        <a class="ghost-btn" href="<?= base_url('designer_cover.php') ?>">?? Kapak</a>
+        <a class="ghost-btn" href="<?= base_url('designer_map.php') ?>">??? Harita</a>
+        <a class="ghost-btn" href="<?= base_url('logout.php') ?>">??k??</a>
       </div>
     </div>
   </div>
 
   <div class="glass-card creator-grid">
     <div>
-      <h2>✨ Yeni Kitap Oluştur</h2>
-      <p>Başlığı seç, görünürlüğü ayarla ve hikâyeni yazmaya başla. Taslaklar tarayıcında saklanır, kaybolmaz.</p>
+      <h2>? Yeni Kitap Olu?tur</h2>
+      <p>Ba?l??? se?, g?r?n?rl??? ayarla ve hik?yeni yazmaya ba?la. Taslaklar taray?c?nda saklan?r, kaybolmaz.</p>
       <div class="weapon-panel">
         <form id="book-form" method="post" action="book_save.php">
           <?= csrf_field(); ?>
           <input type="hidden" name="book_id" value="">
 
-          <label for="title-input">📖 Kitap Başlığı</label>
-          <input name="title" id="title-input" required placeholder="Büyük macera burada başlar...">
+          <label for="title-input">?? Kitap Ba?l???</label>
+          <input name="title" id="title-input" required placeholder="B?y?k macera burada ba?lar...">
 
-          <label for="visibility">🔒 Görünürlük</label>
+          <label for="visibility">?? G?r?n?rl?k</label>
           <select name="visibility" id="visibility">
             <option value="private">Gizli (Sadece Ben)</option>
-            <option value="unlisted">Liste Dışı (Link ile)</option>
-            <option value="public">Herkese Açık</option>
+            <option value="unlisted">Liste D??? (Link ile)</option>
+            <option value="public">Herkese A??k</option>
           </select>
 
-          <label for="description">📝 Kısa Açıklama</label>
-          <textarea name="description" id="description" rows="2" placeholder="Okuyucular kitap kartında bu satırı görür"></textarea>
+          <label for="description">?? K?sa A??klama</label>
+          <textarea name="description" id="description" rows="2" placeholder="Okuyucular kitap kart?nda bu sat?r? g?r?r"></textarea>
 
           <div class="creator-footer">
             <div class="save-indicator unsaved" id="save-badge">
-              <span>💾</span>
-              <span>Henüz kaydedilmedi</span>
+              <span>??</span>
+              <span>Hen?z kaydedilmedi</span>
             </div>
-            <button type="submit">💾 Kaydet ve Devam Et</button>
+            <button type="submit">?? Kaydet ve Devam Et</button>
           </div>
         </form>
       </div>
     </div>
 
     <div>
-      <h2>🖋️ Hikâyeni Yaz</h2>
-      <p style="font-size:0.88rem; opacity:0.75; margin-bottom:14px;">Kalemin ısınıyor. Tema düğmesi ile gece yazımlarında gözlerini dinlendir.</p>
+      <h2>??? Hik?yeni Yaz</h2>
+      <p style="font-size:0.88rem; opacity:0.75; margin-bottom:14px;">Kalemin ?s?n?yor. Tema d??mesi ile gece yaz?mlar?nda g?zlerini dinlendir.</p>
       <div class="toolbar">
         <button type="button" data-cmd="bold" class="btn">B</button>
-        <button type="button" data-cmd="italic" class="btn"><i>İ</i></button>
+        <button type="button" data-cmd="italic" class="btn"><i>?</i></button>
         <button type="button" data-cmd="underline" class="btn"><u>A</u></button>
-        <button type="button" data-cmd="h1" class="btn">Başlık</button>
+        <button type="button" data-cmd="h1" class="btn">Ba?l?k</button>
         <button type="button" data-cmd="ul" class="btn">Liste</button>
       </div>
       <div class="writer-zone">
@@ -795,41 +805,41 @@ body.book-new.dark-theme .bottom-nav a {
           id="content-textarea"
           form="book-form"
           class="writing-textarea"
-          placeholder="Bir zamanlar, uzak bir diyarda...&#10;&#10;Her büyük hikâye tek bir kelimeyle başlar. Şimdi sıra sende."></textarea>
+          placeholder="Bir zamanlar, uzak bir diyarda...&#10;&#10;Her b?y?k hik?ye tek bir kelimeyle ba?lar. ?imdi s?ra sende."></textarea>
 
         <div class="stats-bar">
           <div class="stat-item">
-            <span class="stat-icon">📊</span>
+            <span class="stat-icon">??</span>
             <span><strong id="char-count">0</strong> karakter</span>
           </div>
           <div class="stat-item">
-            <span class="stat-icon">📚</span>
+            <span class="stat-icon">??</span>
             <span><strong id="word-count">0</strong> kelime</span>
           </div>
           <div class="stat-item">
-            <span class="stat-icon">📄</span>
-            <span><strong id="page-count">0</strong> sayfa (yaklaşık)</span>
+            <span class="stat-icon">??</span>
+            <span><strong id="page-count">0</strong> sayfa (yakla??k)</span>
           </div>
           <div class="stat-item">
-            <span class="stat-icon">⏱️</span>
+            <span class="stat-icon">??</span>
             <span><strong id="read-time">0</strong> dk okuma</span>
           </div>
         </div>
       </div>
 
       <div class="inspiration-quote" id="inspiration-quote">
-        "Bir kitap yazmak, içindeki dünyayı kâğıda dökmektir."
+        "Bir kitap yazmak, i?indeki d?nyay? k???da d?kmektir."
       </div>
     </div>
   </div>
 
   <div class="bottom-nav">
-    <a href="<?= base_url('books.php') ?>">📚 Kitaplar</a>
-    <a href="<?= base_url('notes.php') ?>">📝 Notlar</a>
-    <a href="<?= base_url('designer_cover.php') ?>">🎨 Kapak</a>
-    <a href="<?= base_url('designer_map.php') ?>">🗺️ Harita</a>
+    <a href="<?= base_url('books.php') ?>">?? Kitaplar</a>
+    <a href="<?= base_url('notes.php') ?>">?? Notlar</a>
+    <a href="<?= base_url('designer_cover.php') ?>">?? Kapak</a>
+    <a href="<?= base_url('designer_map.php') ?>">??? Harita</a>
   </div>
-  <div class="footer-note">© <?= date('Y') ?> <?= e(APP_NAME) ?> · </div>
+  <div class="footer-note">? <?= date('Y') ?> <?= e(APP_NAME) ?> ? </div>
 </div>
 
 <script src="../assets/js/editor.js"></script>
@@ -845,7 +855,7 @@ body.book-new.dark-theme .bottom-nav a {
   const applyTheme = (mode) => {
     const isDark = mode === 'dark';
     document.body.classList.toggle('dark-theme', isDark);
-    themeThumb.textContent = isDark ? '🌙' : '🌸';
+    themeThumb.textContent = isDark ? '??' : '??';
     themeLabel.textContent = isDark ? 'Siyah' : 'Pembe';
     themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
     localStorage.setItem(storageKey, mode);
@@ -867,10 +877,10 @@ body.book-new.dark-theme .bottom-nav a {
   focusBtn.addEventListener('click', function() {
     document.body.classList.toggle('focus-mode');
     if (document.body.classList.contains('focus-mode')) {
-      focusBtn.textContent = '✖️';
-      focusBtn.title = 'Normal Moda Dön';
+      focusBtn.textContent = '??';
+      focusBtn.title = 'Normal Moda D?n';
     } else {
-      focusBtn.textContent = '👁️';
+      focusBtn.textContent = '???';
       focusBtn.title = 'Odaklanma Modu';
     }
   });
@@ -891,16 +901,16 @@ body.book-new.dark-theme .bottom-nav a {
   }
 
   const quotes = [
-    '"Bir kitap yazmak, içindeki dünyayı kâğıda dökmektir."',
-    '"Her cümle, yeni bir olasılığın kapısını aralar."',
-    '"Yazmak, düşüncelere şekil vermektir."',
-    '"Kelimeler, hayallerin mimarlığıdır."',
-    '"Her yazar, kendi evreninin yaratıcısıdır."',
-    '"Yazı, ruhun aynasıdır."',
-    '"Hikâyeler, zamanın ötesine uzanır."',
-    '"Yazmak cesarettir, paylaşmak ise özgürlük."',
-    '"Her sayfa, yeni bir maceranın başlangıcıdır."',
-    '"Kalem, hayal gücünün değneğidir."'
+    '"Bir kitap yazmak, i?indeki d?nyay? k???da d?kmektir."',
+    '"Her c?mle, yeni bir olas?l???n kap?s?n? aralar."',
+    '"Yazmak, d???ncelere ?ekil vermektir."',
+    '"Kelimeler, hayallerin mimarl???d?r."',
+    '"Her yazar, kendi evreninin yarat?c?s?d?r."',
+    '"Yaz?, ruhun aynas?d?r."',
+    '"Hik?yeler, zaman?n ?tesine uzan?r."',
+    '"Yazmak cesarettir, payla?mak ise ?zg?rl?k."',
+    '"Her sayfa, yeni bir maceran?n ba?lang?c?d?r."',
+    '"Kalem, hayal g?c?n?n de?ne?idir."'
   ];
 
   const updateStats = () => {
@@ -920,7 +930,7 @@ body.book-new.dark-theme .bottom-nav a {
     updateStats();
     if (saveBadge) {
       saveBadge.className = 'save-indicator unsaved';
-      saveBadge.innerHTML = '<span>⏳</span><span>Yazılıyor...</span>';
+      saveBadge.innerHTML = '<span>?</span><span>Yaz?l?yor...</span>';
     }
   }, { passive: true });
 
@@ -944,18 +954,18 @@ body.book-new.dark-theme .bottom-nav a {
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(() => {
         saveBadge.className = 'save-indicator saved';
-        saveBadge.innerHTML = '<span>✅</span><span>Otomatik kaydedildi</span>';
+        saveBadge.innerHTML = '<span>?</span><span>Otomatik kaydedildi</span>';
 
         setTimeout(() => {
           saveBadge.className = 'save-indicator unsaved';
-          saveBadge.innerHTML = '<span>💾</span><span>Değişiklikler kaydedildi</span>';
+          saveBadge.innerHTML = '<span>??</span><span>De?i?iklikler kaydedildi</span>';
         }, 2000);
       }, 2800);
     }, { passive: true });
 
     form.addEventListener('submit', () => {
       saveBadge.className = 'save-indicator saved';
-      saveBadge.innerHTML = '<span>✅</span><span>Kaydediliyor...</span>';
+      saveBadge.innerHTML = '<span>?</span><span>Kaydediliyor...</span>';
     });
   }
 })();
