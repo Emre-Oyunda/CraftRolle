@@ -346,7 +346,6 @@ body.book-new.dark-theme .user-chip {
   outline: none;
   border-color: rgba(198, 107, 231, 0.6);
   box-shadow: 0 0 0 4px rgba(198, 107, 231, 0.18);
-  background: rgba(255, 255, 255, 0.95);
 }
 
 body.book-new.dark-theme .weapon-panel input,
@@ -354,6 +353,22 @@ body.book-new.dark-theme .weapon-panel textarea,
 body.book-new.dark-theme .weapon-panel select {
   background: rgba(18, 14, 36, 0.85);
   border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+body.book-new:not(.dark-theme) .weapon-panel input:focus,
+body.book-new:not(.dark-theme) .weapon-panel textarea:focus,
+body.book-new:not(.dark-theme) .weapon-panel select:focus,
+body.book-new:not(.dark-theme) .writer-zone textarea:focus {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+body.book-new.dark-theme .weapon-panel input:focus,
+body.book-new.dark-theme .weapon-panel textarea:focus,
+body.book-new.dark-theme .weapon-panel select:focus,
+body.book-new.dark-theme .writer-zone textarea:focus {
+  background: rgba(26, 20, 46, 0.95);
+  border-color: rgba(124, 58, 237, 0.55);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.22);
 }
 
 .toolbar {
